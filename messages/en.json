@@ -1,0 +1,215 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "customers": "Customers",
+    "pipeline": "Sales Pipeline",
+    "campaigns": "Campaigns",
+    "tasks": "Tasks",
+    "calls": "Calls",
+    "whatsapp": "WhatsApp",
+    "reports": "Reports",
+    "users": "Employees",
+    "roles": "Roles",
+    "attendance": "Attendance",
+    "ai": "AI Assistant",
+    "branding": "Branding",
+    "subscription": "Subscription",
+    "billing": "Billing",
+    "backups": "Backups",
+    "settings": "Settings"
+  },
+  "header": {
+    "search": "Search...",
+    "addLead": "Add Lead",
+    "addTask": "New Task",
+    "addDeal": "New Deal",
+    "profile": "Profile",
+    "logout": "Logout",
+    "notifications": "Notifications",
+    "markRead": "Mark as read",
+    "newLeadNotif": "New lead registered",
+    "timeAgo": "5 mins ago"
+  },
+  "stat": {
+    "totalLeads": "Total Leads",
+    "newLeadsToday": "Today's Leads",
+    "following": "Following",
+    "neglected": "Neglected",
+    "openDeals": "Open Deals",
+    "closedDeals": "Closed Deals",
+    "salesValue": "Sales Value",
+    "conversionRate": "Conversion Rate",
+    "callsCount": "Total Calls",
+    "whatsappCount": "WhatsApp Msgs",
+    "overdueTasks": "Overdue Tasks",
+    "employees": "Employees"
+  },
+  "sidebar": {
+    "logoText": "East Guide",
+    "system": "CRM SYSTEM",
+    "adminName": "Ahmed Alotaibi",
+    "adminRole": "Company Admin",
+    "groupMain": "Main Navigation",
+    "groupMarketing": "Marketing & Comms",
+    "groupManagement": "Management & Reports",
+    "groupSystem": "System & Settings"
+  },
+  "dash": {
+    "thisMonth": "+12% this month",
+    "leadsChartTitle": "Leads (Last 7 Days)",
+    "salesChartTitle": "Monthly Sales",
+    "conversionChartTitle": "Conversion Rate (Last 6 Mos)",
+    "pipelineTitle": "Pipeline Distribution",
+    "performanceTitle": "Employee Performance (Top 5)",
+    "deals": "Deals",
+    "value": "Value",
+    "bestCampaignsTitle": "Best Campaigns (ROI)",
+    "leadsCount": "Leads",
+    "return": "Return",
+    "conversion": "Conv",
+    "recentLeads": "Recent Leads",
+    "viewAll": "View All",
+    "recentTasks": "Recent Tasks",
+    "recentCalls": "Recent Calls",
+    "recentNotifications": "Recent Notifications",
+    "markAsRead": "Mark as read",
+    "table": {
+      "name": "Name",
+      "source": "Source",
+      "stage": "Stage",
+      "interest": "Interest",
+      "value": "Value"
+    }
+  },
+  "common": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "all": "All",
+    "export": "Export",
+    "import": "Import",
+    "filters": "Filters"
+  },
+  "leads": {
+    "title": "Leads Management",
+    "subtitle": "Manage and track new lead pipeline",
+    "addBtn": "Add Lead",
+    "searchPlaceholder": "Search by name, phone, or email...",
+    "filterSource": "By Source",
+    "filterStatus": "By Status",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "city": "City",
+      "country": "Country",
+      "source": "Source",
+      "campaign": "Campaign",
+      "agent": "Agent",
+      "stage": "Stage",
+      "interest": "Interest",
+      "value": "Value",
+      "lastContact": "Last Contact",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view": "View Details",
+      "more": "More Actions",
+      "edit": "Edit",
+      "assign": "Assign Employee",
+      "changeStage": "Change Stage",
+      "addTask": "Add Task/Note",
+      "delete": "Delete"
+    },
+    "pagination": {
+      "info": "Showing 1-5 of 12,480 leads",
+      "prev": "Prev",
+      "next": "Next"
+    }
+  },
+  "pipeline": {
+    "title": "Sales Pipeline",
+    "subtitle": "Manage sales stages and deals with drag and drop",
+    "addDeal": "Add Deal",
+    "dragHere": "Drag here"
+  },
+  "tasks": {
+    "title": "Tasks Management",
+    "searchPlaceholder": "Search tasks...",
+    "addTaskBtn": "Add Task",
+    "tableName": "Task Name",
+    "tableLead": "Lead",
+    "tableAgent": "Employee",
+    "tablePriority": "Priority",
+    "tableDue": "Due Date",
+    "tableStatus": "Status",
+    "tableActions": "Actions",
+    "actions": {
+      "complete": "Complete Task",
+      "remind": "Send Reminder"
+    }
+  },
+  "calls": {
+    "title": "Call Logs",
+    "searchPlaceholder": "Search calls...",
+    "tableTime": "Call Time",
+    "tableDuration": "Duration",
+    "tableResult": "Result",
+    "actions": {
+      "call": "Call",
+      "addResult": "Add Result",
+      "callback": "Callback"
+    }
+  },
+  "whatsapp": {
+    "title": "WhatsApp Message Templates",
+    "subtitle": "Manage ready-to-use message templates for quick follow-ups with leads.",
+    "addTemplate": "Add New Template",
+    "searchPlaceholder": "Search templates...",
+    "chats": "Chats",
+    "chatSearchPlaceholder": "Search or start new chat",
+    "typeMessage": "Type a message",
+    "actions": {
+      "copy": "Copy Template",
+      "testSend": "Test Sending",
+      "toggle": "Toggle Active/Inactive"
+    }
+  },
+  "customers": {
+    "title": "Customers Management",
+    "searchPlaceholder": "Search customers...",
+    "addBtn": "Add New Customer",
+    "tableCompany": "Company / Customer",
+    "tableContact": "Contact Person",
+    "tableService": "Service / Plan",
+    "tableSales": "Total Sales",
+    "tableJoinDate": "Join Date",
+    "actions": {
+      "invoices": "Invoice Log",
+      "editDetails": "Edit Customer Info",
+      "addService": "Add New Service",
+      "deleteCustomer": "Delete Customer"
+    }
+  },
+  "users": {
+    "title": "Employees & Users Management",
+    "subtitle": "Control employee access and assign roles and permissions.",
+    "addBtn": "Add User",
+    "searchPlaceholder": "Search by name or email...",
+    "tableUser": "User",
+    "tableRole": "Role / Permission",
+    "tableLastLogin": "Last Login",
+    "actions": {
+      "editRole": "Edit Role",
+      "block": "Block User"
+    }
+  }
+}

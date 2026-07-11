@@ -1,0 +1,215 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "leads": "العملاء المحتملين",
+    "customers": "العملاء",
+    "pipeline": "Pipeline المبيعات",
+    "campaigns": "الحملات",
+    "tasks": "المهام",
+    "calls": "المكالمات",
+    "whatsapp": "واتساب",
+    "reports": "التقارير",
+    "users": "الموظفون",
+    "roles": "الصلاحيات",
+    "attendance": "الحضور",
+    "ai": "المساعد الذكي",
+    "branding": "الهوية البصرية",
+    "subscription": "الاشتراك",
+    "billing": "الفواتير",
+    "backups": "النسخ الاحتياطي",
+    "settings": "الإعدادات"
+  },
+  "header": {
+    "search": "بحث...",
+    "addLead": "إضافة Lead",
+    "addTask": "مهمة جديدة",
+    "addDeal": "صفقة جديدة",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج",
+    "notifications": "الإشعارات",
+    "markRead": "تحديد كـ مقروء",
+    "newLeadNotif": "تسجيل عميل جديد",
+    "timeAgo": "منذ 5 دقائق"
+  },
+  "stat": {
+    "totalLeads": "إجمالي العملاء",
+    "newLeadsToday": "عملاء اليوم",
+    "following": "متابعة",
+    "neglected": "مهمل",
+    "openDeals": "صفقات مفتوحة",
+    "closedDeals": "صفقات مغلقة",
+    "salesValue": "قيمة المبيعات",
+    "conversionRate": "نسبة التحويل",
+    "callsCount": "عدد المكالمات",
+    "whatsappCount": "رسائل واتساب",
+    "overdueTasks": "مهام متأخرة",
+    "employees": "الموظفين"
+  },
+  "sidebar": {
+    "logoText": "دليل الشرق",
+    "system": "نظام إدارة العملاء",
+    "adminName": "أحمد العتيبي",
+    "adminRole": "مدير الشركة",
+    "groupMain": "الرئيسية",
+    "groupMarketing": "التسويق والتواصل",
+    "groupManagement": "الإدارة والتقارير",
+    "groupSystem": "النظام والضبط"
+  },
+  "dash": {
+    "thisMonth": "+12% هذا الشهر",
+    "leadsChartTitle": "العملاء المحتملين (آخر 7 أيام)",
+    "salesChartTitle": "المبيعات الشهرية",
+    "conversionChartTitle": "نسبة التحويل (آخر 6 أشهر)",
+    "pipelineTitle": "توزيع مراحل المبيعات",
+    "performanceTitle": "أداء الموظفين (أفضل 5)",
+    "deals": "صفقة",
+    "value": "القيمة",
+    "bestCampaignsTitle": "أفضل الحملات (ROI)",
+    "leadsCount": "العملاء",
+    "return": "عائد",
+    "conversion": "تحويل",
+    "recentLeads": "آخر العملاء المحتملين",
+    "viewAll": "عرض الكل",
+    "recentTasks": "آخر المهام",
+    "recentCalls": "آخر المكالمات",
+    "recentNotifications": "آخر الإشعارات",
+    "markAsRead": "تحديد كـ مقروء",
+    "table": {
+      "name": "الاسم",
+      "source": "المصدر",
+      "stage": "المرحلة",
+      "interest": "الاهتمام",
+      "value": "القيمة"
+    }
+  },
+  "common": {
+    "add": "إضافة",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "all": "الكل",
+    "export": "تصدير",
+    "import": "استيراد",
+    "filters": "تصفية"
+  },
+  "leads": {
+    "title": "إدارة العملاء المحتملين",
+    "subtitle": "إدارة وتتبع مسار العملاء الجدد",
+    "addBtn": "إضافة عميل محتمل",
+    "searchPlaceholder": "ابحث بالاسم، الهاتف، أو الإيميل...",
+    "filterSource": "حسب المصدر",
+    "filterStatus": "حسب الحالة",
+    "table": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "whatsapp": "واتساب",
+      "city": "المدينة",
+      "country": "الدولة",
+      "source": "المصدر",
+      "campaign": "الحملة",
+      "agent": "المسؤول",
+      "stage": "المرحلة",
+      "interest": "الاهتمام",
+      "value": "القيمة",
+      "lastContact": "آخر تواصل",
+      "status": "الحالة",
+      "actions": "العمليات"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "more": "إجراءات إضافية",
+      "edit": "تعديل",
+      "assign": "نقل لموظف",
+      "changeStage": "تغيير المرحلة",
+      "addTask": "إضافة مهمة/ملاحظة",
+      "delete": "حذف"
+    },
+    "pagination": {
+      "info": "عرض 1-5 من 12,480 عميل",
+      "prev": "السابق",
+      "next": "التالي"
+    }
+  },
+  "pipeline": {
+    "title": "Pipeline المبيعات",
+    "subtitle": "إدارة مراحل وصفقات المبيعات عبر السحب والإفلات",
+    "addDeal": "إضافة صفقة",
+    "dragHere": "اسحب هنا"
+  },
+  "tasks": {
+    "title": "إدارة المهام",
+    "searchPlaceholder": "بحث في المهام...",
+    "addTaskBtn": "إضافة مهمة",
+    "tableName": "اسم المهمة",
+    "tableLead": "العميل",
+    "tableAgent": "الموظف",
+    "tablePriority": "الأولوية",
+    "tableDue": "تاريخ ووقت الإنجاز",
+    "tableStatus": "الحالة",
+    "tableActions": "إجراءات",
+    "actions": {
+      "complete": "إنهاء المهمة",
+      "remind": "إرسال تذكير"
+    }
+  },
+  "calls": {
+    "title": "سجل المكالمات",
+    "searchPlaceholder": "بحث في المكالمات...",
+    "tableTime": "وقت الاتصال",
+    "tableDuration": "المدة",
+    "tableResult": "النتيجة",
+    "actions": {
+      "call": "اتصال",
+      "addResult": "إضافة نتيجة",
+      "callback": "إعادة الاتصال"
+    }
+  },
+  "whatsapp": {
+    "title": "قوالب رسائل واتساب",
+    "subtitle": "إدارة قوالب الرسائل الجاهزة للاستخدام السريع مع العملاء المحتملين.",
+    "addTemplate": "إضافة قالب جديد",
+    "searchPlaceholder": "بحث في القوالب...",
+    "chats": "المحادثات",
+    "chatSearchPlaceholder": "بحث أو بدء محادثة جديدة",
+    "typeMessage": "اكتب رسالة",
+    "actions": {
+      "copy": "نسخ القالب",
+      "testSend": "تجربة الإرسال",
+      "toggle": "تفعيل/إيقاف"
+    }
+  },
+  "customers": {
+    "title": "إدارة العملاء الدائمين",
+    "searchPlaceholder": "بحث في العملاء...",
+    "addBtn": "إضافة عميل جديد",
+    "tableCompany": "الشركة / العميل",
+    "tableContact": "جهة الاتصال",
+    "tableService": "الخدمة / الباقة",
+    "tableSales": "إجمالي المبيعات",
+    "tableJoinDate": "تاريخ الانضمام",
+    "actions": {
+      "invoices": "سجل الفواتير",
+      "editDetails": "تعديل بيانات العميل",
+      "addService": "إضافة خدمة جديدة",
+      "deleteCustomer": "حذف العميل"
+    }
+  },
+  "users": {
+    "title": "إدارة الموظفين والمستخدمين",
+    "subtitle": "التحكم في وصول الموظفين وتعيين الصلاحيات للمستخدمين.",
+    "addBtn": "إضافة مستخدم",
+    "searchPlaceholder": "بحث باسم المستخدم أو البريد...",
+    "tableUser": "المستخدم",
+    "tableRole": "الصلاحية (الدور)",
+    "tableLastLogin": "آخر دخول",
+    "actions": {
+      "editRole": "تعديل الصلاحية",
+      "block": "حظر المستخدم"
+    }
+  }
+}
