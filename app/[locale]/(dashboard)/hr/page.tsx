@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MoreHorizontal, Edit, Trash2, Mail, Phone, Plus, X, AlertTriangle } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Mail, Phone, Plus, X, AlertTriangle, Search } from "lucide-react";
 import { useLocale } from "next-intl";
 
 export default function HRPage() {
