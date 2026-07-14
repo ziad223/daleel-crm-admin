@@ -17,7 +17,9 @@
     "subscription": "Subscription",
     "billing": "Billing",
     "backups": "Backups",
-    "settings": "Settings"
+    "settings": "Settings",
+    "followups": "Follow-ups",
+    "team": "Team"
   },
   "header": {
     "search": "Search...",

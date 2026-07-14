@@ -294,9 +294,9 @@ export default function LeadsPage() {
                   {(currentPage - 1) * pageSize + index + 1}
                 </td>
                 <td>
-                  <span className="font-medium text-[var(--primary)] hover:underline block cursor-pointer">
+                  <Link href={`/${locale}/leads/${lead.id}`} className="font-medium text-[var(--primary)] hover:underline block cursor-pointer">
                     {lead.name}
-                  </span>
+                  </Link>
                   <div className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
                     <Mail className="w-3 h-3" />
                     {lead.email}
@@ -337,13 +337,13 @@ export default function LeadsPage() {
                 </td>
                 <td>
                   <div className={`flex items-center gap-1.5 ${isRtl ? 'justify-start' : 'justify-end'}`}>
-                    <button 
-                      onClick={() => setViewingLead(lead)}
-                      className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer" 
+                    <Link 
+                      href={`/${locale}/leads/${lead.id}`}
+                      className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors cursor-pointer flex" 
                       title={t("leads.actions.view")}
                     >
                       <Eye className="w-4 h-4" />
-                    </button>
+                    </Link>
                     <div className="relative group cursor-pointer">
                       <button className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors" title={t("leads.actions.more")}>
                         <MoreHorizontal className="w-4 h-4" />
@@ -681,82 +681,7 @@ export default function LeadsPage() {
         </div>
       )}
 
-      {/* View Lead Details Modal */}
-      {viewingLead && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <h3 className="font-bold text-lg text-slate-800">{viewingLead.name}</h3>
-                <span className="badge badge-info">{viewingLead.stage}</span>
-              </div>
-              <button onClick={() => setViewingLead(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-6 text-right">
-              {/* Detailed information grid */}
-              <div className="grid grid-cols-2 gap-y-4 gap-x-6">
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "البريد الإلكتروني" : "Email"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.email}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "رقم الهاتف" : "Phone"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.phone}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "الموظف المسؤول" : "Assignee"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.agent}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "القيمة المتوقعة" : "Expected Value"}</span>
-                  <span className="text-sm font-semibold text-emerald-600 block">{viewingLead.value ? formatCurrency(viewingLead.value) : "—"}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "الموقع" : "Location"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.city}، {viewingLead.country}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "مصدر العميل" : "Lead Source"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.source}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "الحملة التسويقية" : "Campaign"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.campaign || "—"}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "درجة الاهتمام" : "Interest"}</span>
-                  <span className={`badge mt-0.5 ${
-                    viewingLead.interest === "ساخن" || viewingLead.interest === "Hot" ? "badge-danger" :
-                    viewingLead.interest === "دافئ" || viewingLead.interest === "Warm" ? "badge-warning" : "badge-neutral"
-                  }`}>
-                    {viewingLead.interest}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "آخر تواصل" : "Last Contact"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.lastContact}</span>
-                </div>
-                <div>
-                  <span className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{isAr ? "الحالة" : "Status"}</span>
-                  <span className="text-sm font-medium text-slate-700 block">{viewingLead.status}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button 
-                onClick={() => setViewingLead(null)} 
-                className="btn-primary w-24"
-              >
-                {isAr ? "إغلاق" : "Close"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Delete Confirmation Modal */}
       {deletingLead && (

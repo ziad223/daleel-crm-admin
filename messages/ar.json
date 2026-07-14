@@ -17,7 +17,9 @@
     "subscription": "الاشتراك",
     "billing": "الفواتير",
     "backups": "النسخ الاحتياطي",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "followups": "المتابعات",
+    "team": "فريق المبيعات"
   },
   "header": {
     "search": "بحث...",
