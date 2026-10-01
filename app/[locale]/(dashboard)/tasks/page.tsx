@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, MoreHorizontal, CheckCircle, Edit, Trash2, Bell, X, AlertTriangle } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, CheckCircle, Edit, Trash2, Bell, AlertTriangle } from "lucide-react";
 import { getMockData } from "@/lib/mock-data";
 import { useTranslations, useLocale } from "next-intl";
+import { Modal } from "@/components/ui/modal";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function TasksPage() {
   const t = useTranslations();
@@ -163,9 +165,15 @@ export default function TasksPage() {
       </div>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
+      {filteredTasks.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <EmptyState isSearch={search.length > 0} searchQuery={search} />
+        </div>
+      ) : (
+        <>
+          <div className="table-container mt-4">
+            <table className="data-table">
+              <thead>
             <tr>
               <th className="w-12 text-center">#</th>
               <th>{t("tasks.tableName")}</th>
@@ -247,204 +255,146 @@ export default function TasksPage() {
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center text-sm text-slate-500">
-          <div>
-            {isAr 
-              ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredTasks.length)} - ${Math.min(currentPage * pageSize, filteredTasks.length)} من أصل ${filteredTasks.length} مهام`
-              : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredTasks.length)} - ${Math.min(currentPage * pageSize, filteredTasks.length)} of ${filteredTasks.length} tasks`
-            }
-          </div>
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "السابق" : "Prev"}
-            </button>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "التالي" : "Next"}
-            </button>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-sm text-slate-500 mt-4">
+            <div>
+              {isAr 
+                ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredTasks.length)} - ${Math.min(currentPage * pageSize, filteredTasks.length)} من أصل ${filteredTasks.length} مهام`
+                : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredTasks.length)} - ${Math.min(currentPage * pageSize, filteredTasks.length)} of ${filteredTasks.length} tasks`
+              }
+            </div>
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "السابق" : "Prev"}
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "التالي" : "Next"}
+              </button>
+            </div>
+          </div>
+        )}
+      </>
       )}
 
       {/* Add Task Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-md w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-800">{isAr ? "إضافة مهمة جديدة" : "Add New Task"}</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title={isAr ? "إضافة مهمة جديدة" : "Add New Task"}
+        maxWidth="md"
+        footer={
+          <>
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('addTaskForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "حفظ" : "Save"}</button>
+          </>
+        }
+      >
+        <form id="addTaskForm" onSubmit={handleAddTask} className="space-y-4">
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم المهمة" : "Task Name"}</label><input type="text" name="title" required className="input" /></div>
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "العميل المرتبط" : "Linked Lead"}</label><input type="text" name="lead" required className="input" /></div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "تاريخ الاستحقاق" : "Due Date"}</label><input type="text" name="due" placeholder={isAr ? "غداً 10:00 ص" : "Tmrw 10 AM"} className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الأولوية" : "Priority"}</label>
+              <select name="priority" className="input">
+                <option value={isAr ? "عالية" : "High"}>{isAr ? "عالية" : "High"}</option>
+                <option value={isAr ? "متوسطة" : "Med"}>{isAr ? "متوسطة" : "Med"}</option>
+                <option value={isAr ? "منخفضة" : "Low"}>{isAr ? "منخفضة" : "Low"}</option>
+              </select>
             </div>
-            <form onSubmit={handleAddTask} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم المهمة" : "Task Name"}</label>
-                <input type="text" name="title" required className="input" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "العميل المرتبط" : "Linked Lead"}</label>
-                <input type="text" name="lead" required className="input" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "تاريخ الاستحقاق" : "Due Date"}</label>
-                  <input type="text" name="due" placeholder={isAr ? "غداً 10:00 ص" : "Tmrw 10 AM"} className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الأولوية" : "Priority"}</label>
-                  <select name="priority" className="input">
-                    <option value={isAr ? "عالية" : "High"}>{isAr ? "عالية" : "High"}</option>
-                    <option value={isAr ? "متوسطة" : "Med"}>{isAr ? "متوسطة" : "Med"}</option>
-                    <option value={isAr ? "منخفضة" : "Low"}>{isAr ? "منخفضة" : "Low"}</option>
-                  </select>
-                </div>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "حفظ" : "Save"}
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
+        </form>
+      </Modal>
 
       {/* Edit Task Modal */}
-      {editingTask && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-md w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-800">{isAr ? "تعديل المهمة" : "Edit Task"}</h3>
-              <button onClick={() => setEditingTask(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
+      <Modal
+        isOpen={!!editingTask}
+        onClose={() => setEditingTask(null)}
+        title={isAr ? "تعديل المهمة" : "Edit Task"}
+        maxWidth="md"
+        footer={
+          <>
+            <button type="button" onClick={() => setEditingTask(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('editTaskForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "حفظ التعديلات" : "Save Changes"}</button>
+          </>
+        }
+      >
+        <form id="editTaskForm" onSubmit={handleEditTaskSubmit} className="space-y-4">
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم المهمة" : "Task Name"}</label><input type="text" name="title" defaultValue={editingTask?.title} required className="input" /></div>
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "العميل المرتبط" : "Linked Lead"}</label><input type="text" name="lead" defaultValue={editingTask?.lead} required className="input" /></div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "تاريخ الاستحقاق" : "Due Date"}</label><input type="text" name="due" defaultValue={editingTask?.due} required className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الأولوية" : "Priority"}</label>
+              <select name="priority" defaultValue={editingTask?.priority} className="input">
+                <option value={isAr ? "عالية" : "High"}>{isAr ? "عالية" : "High"}</option>
+                <option value={isAr ? "متوسطة" : "Med"}>{isAr ? "متوسطة" : "Med"}</option>
+                <option value={isAr ? "منخفضة" : "Low"}>{isAr ? "منخفضة" : "Low"}</option>
+              </select>
             </div>
-            <form onSubmit={handleEditTaskSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم المهمة" : "Task Name"}</label>
-                <input type="text" name="title" defaultValue={editingTask.title} required className="input" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "العميل المرتبط" : "Linked Lead"}</label>
-                <input type="text" name="lead" defaultValue={editingTask.lead} required className="input" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "تاريخ الاستحقاق" : "Due Date"}</label>
-                  <input type="text" name="due" defaultValue={editingTask.due} required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الأولوية" : "Priority"}</label>
-                  <select name="priority" defaultValue={editingTask.priority} className="input">
-                    <option value={isAr ? "عالية" : "High"}>{isAr ? "عالية" : "High"}</option>
-                    <option value={isAr ? "متوسطة" : "Med"}>{isAr ? "متوسطة" : "Med"}</option>
-                    <option value={isAr ? "منخفضة" : "Low"}>{isAr ? "منخفضة" : "Low"}</option>
-                  </select>
-                </div>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setEditingTask(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "حفظ التعديلات" : "Save Changes"}
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
-      )}
+        </form>
+      </Modal>
 
       {/* Remind Task Modal */}
-      {remindingTask && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-md text-slate-800">{isAr ? "تعيين تذكير للمهمة" : "Set Task Reminder"}</h3>
-              <button onClick={() => setRemindingTask(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleRemindTaskSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "وقت التذكير" : "Reminder Time"}</label>
-                <input type="datetime-local" required className="input" defaultValue="2026-07-12T09:00" />
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setRemindingTask(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "تأكيد" : "Confirm"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={!!remindingTask}
+        onClose={() => setRemindingTask(null)}
+        title={isAr ? "تعيين تذكير للمهمة" : "Set Task Reminder"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setRemindingTask(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('remindForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "تأكيد" : "Confirm"}</button>
+          </>
+        }
+      >
+        <form id="remindForm" onSubmit={handleRemindTaskSubmit}>
+          <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "وقت التذكير" : "Reminder Time"}</label>
+          <input type="datetime-local" required className="input" defaultValue="2026-07-12T09:00" />
+        </form>
+      </Modal>
 
-      {/* Delete Confirmation Modal */}
-      {deletingTask && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-6 text-center space-y-4">
-              <div className="mx-auto w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-bold text-lg text-slate-800">{isAr ? "تأكيد الحذف" : "Confirm Delete"}</h3>
-                <p className="text-sm text-slate-500">
-                  {isAr 
-                    ? `هل أنت متأكد من رغبتك في حذف المهمة "${deletingTask.title}"؟`
-                    : `Are you sure you want to delete task "${deletingTask.title}"?`}
-                </p>
-              </div>
-            </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-2 justify-center">
-              <button 
-                type="button" 
-                onClick={() => setDeletingTask(null)} 
-                className="btn-outline w-24"
-              >
-                {isAr ? "إلغاء" : "Cancel"}
-              </button>
-              <button 
-                type="button" 
-                onClick={handleDeleteTaskConfirm} 
-                className="btn-danger w-24 bg-red-600 text-white hover:bg-red-700"
-              >
-                {isAr ? "حذف" : "Delete"}
-              </button>
-            </div>
-          </div>
+      {/* Delete Task Modal */}
+      <Modal
+        isOpen={!!deletingTask}
+        onClose={() => setDeletingTask(null)}
+        title={isAr ? "تأكيد الحذف" : "Confirm Delete"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button onClick={() => setDeletingTask(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={handleDeleteTaskConfirm} className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl shadow-lg shadow-red-500/30 transition-all">{isAr ? "حذف" : "Delete"}</button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center justify-center text-center py-4">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4"><AlertTriangle className="w-8 h-8" /></div>
+          <h3 className="text-lg font-bold text-slate-900 mb-2">{isAr ? "هل أنت متأكد؟" : "Are you sure?"}</h3>
+          <p className="text-slate-500">{isAr ? `سيتم حذف "‏${deletingTask?.title}"، لا يمكن التراجع.` : `Task "${deletingTask?.title}" will be permanently deleted.`}</p>
         </div>
-      )}
+      </Modal>
 
       {/* Toast Notification */}
       {toast && (

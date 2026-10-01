@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Search, Filter, Clock, CheckCircle, Plus, LogIn, LogOut } from "lucide-react";
 import { useLocale } from "next-intl";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function AttendancePage() {
   const locale = useLocale();
@@ -162,10 +163,16 @@ export default function AttendancePage() {
         <input type="date" className="input max-w-[200px]" defaultValue="2026-07-10" />
       </div>
 
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
-            <tr>
+      {filteredRecords.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <EmptyState isSearch={search.length > 0} searchQuery={search} />
+        </div>
+      ) : (
+        <>
+          <div className="table-container mt-4">
+            <table className="data-table">
+              <thead>
+                <tr>
               <th className="w-12 text-center">#</th>
               <th>{isAr ? "الموظف" : "Employee"}</th>
               <th>{isAr ? "القسم" : "Department"}</th>
@@ -195,46 +202,48 @@ export default function AttendancePage() {
                   </span>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center text-sm text-slate-500">
-          <div>
-            {isAr 
-              ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredRecords.length)} - ${Math.min(currentPage * pageSize, filteredRecords.length)} من أصل ${filteredRecords.length} سجلات`
-              : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredRecords.length)} - ${Math.min(currentPage * pageSize, filteredRecords.length)} of ${filteredRecords.length} records`
-            }
-          </div>
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "السابق" : "Prev"}
-            </button>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "التالي" : "Next"}
-            </button>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-sm text-slate-500 mt-4">
+            <div>
+              {isAr 
+                ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredRecords.length)} - ${Math.min(currentPage * pageSize, filteredRecords.length)} من أصل ${filteredRecords.length} سجلات`
+                : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredRecords.length)} - ${Math.min(currentPage * pageSize, filteredRecords.length)} of ${filteredRecords.length} records`
+              }
+            </div>
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "السابق" : "Prev"}
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "التالي" : "Next"}
+              </button>
+            </div>
+          </div>
+        )}
+      </>
       )}
 
       {/* Toast Notification */}

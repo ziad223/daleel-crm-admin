@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, MoreHorizontal, Shield, Edit, Trash2, X, AlertTriangle } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Shield, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { Modal } from "@/components/ui/modal";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function UsersPage() {
   const t = useTranslations();
@@ -110,11 +112,18 @@ export default function UsersPage() {
             {t("users.addBtn")}
           </button>
         </div>
+
       </div>
 
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
+      {filteredUsers.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <EmptyState isSearch={search.length > 0} searchQuery={search} />
+        </div>
+      ) : (
+        <>
+          <div className="table-container mt-4">
+            <table className="data-table">
+              <thead>
             <tr>
               <th className="w-12 text-center">#</th>
               <th>{t("users.tableUser")}</th>
@@ -168,162 +177,114 @@ export default function UsersPage() {
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center text-sm text-slate-500">
-          <div>
-            {isAr 
-              ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredUsers.length)} - ${Math.min(currentPage * pageSize, filteredUsers.length)} من أصل ${filteredUsers.length} مستخدمين`
-              : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredUsers.length)} - ${Math.min(currentPage * pageSize, filteredUsers.length)} of ${filteredUsers.length} users`
-            }
-          </div>
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "السابق" : "Prev"}
-            </button>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "التالي" : "Next"}
-            </button>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-sm text-slate-500 mt-4">
+            <div>
+              {isAr 
+                ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredUsers.length)} - ${Math.min(currentPage * pageSize, filteredUsers.length)} من أصل ${filteredUsers.length} مستخدمين`
+                : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredUsers.length)} - ${Math.min(currentPage * pageSize, filteredUsers.length)} of ${filteredUsers.length} users`
+              }
+            </div>
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "السابق" : "Prev"}
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "التالي" : "Next"}
+              </button>
+            </div>
+          </div>
+        )}
+      </>
       )}
 
       {/* Add User Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-800">{isAr ? "إضافة مستخدم جديد" : "Add New User"}</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleAddUserSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الاسم" : "Name"}</label>
-                <input type="text" name="name" required className="input" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
-                <input type="email" name="email" required className="input" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الدور الوظيفي" : "Role"}</label>
-                <select name="role" className="input">
-                  {(isAr 
-                    ? ["مدير الشركة", "مدير المبيعات", "مسؤول مبيعات", "وكيل الدعم", "المالية"]
-                    : ["Company Admin", "Sales Manager", "Sales Agent", "Support Agent", "Finance"]
-                  ).map((role) => (
-                    <option key={role} value={role}>{role}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn-outline cursor-pointer">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent cursor-pointer">
-                  {isAr ? "حفظ" : "Save"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title={isAr ? "إضافة مستخدم جديد" : "Add New User"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('addUserForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "حفظ" : "Save"}</button>
+          </>
+        }
+      >
+        <form id="addUserForm" onSubmit={handleAddUserSubmit} className="space-y-4">
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الاسم" : "Name"}</label><input type="text" name="name" required className="input" /></div>
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label><input type="email" name="email" required className="input" /></div>
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الدور الوظيفي" : "Role"}</label>
+            <select name="role" className="input">
+              {(isAr ? ["مدير الشركة", "مدير المبيعات", "مسؤول مبيعات", "وكيل الدعم", "المالية"] : ["Company Admin", "Sales Manager", "Sales Agent", "Support Agent", "Finance"]).map(r => <option key={r} value={r}>{r}</option>)}
+            </select>
           </div>
-        </div>
-      )}
+        </form>
+      </Modal>
 
       {/* Edit Role Modal */}
-      {editingUser && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-md text-slate-800">{isAr ? "تغيير صلاحيات المستخدم" : "Edit User Role"}</h3>
-              <button onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleEditRoleSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-2">{isAr ? "اختر الدور الوظيفي الجديد" : "Select Role"}</label>
-                <select name="role" defaultValue={editingUser.role} className="input">
-                  {(isAr 
-                    ? ["مدير الشركة", "مدير المبيعات", "مسؤول مبيعات", "وكيل الدعم", "المالية"]
-                    : ["Company Admin", "Sales Manager", "Sales Agent", "Support Agent", "Finance"]
-                  ).map((role) => (
-                    <option key={role} value={role}>{role}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setEditingUser(null)} className="btn-outline cursor-pointer">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent cursor-pointer">
-                  {isAr ? "تحديث" : "Update"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={!!editingUser}
+        onClose={() => setEditingUser(null)}
+        title={isAr ? "تغيير صلاحيات المستخدم" : "Edit User Role"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setEditingUser(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('editRoleForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "تحديث" : "Update"}</button>
+          </>
+        }
+      >
+        <form id="editRoleForm" onSubmit={handleEditRoleSubmit}>
+          <label className="block text-xs font-semibold text-slate-500 mb-2">{isAr ? "اختر الدور الوظيفي الجديد" : "Select Role"}</label>
+          <select name="role" defaultValue={editingUser?.role} className="input">
+            {(isAr ? ["مدير الشركة", "مدير المبيعات", "مسؤول مبيعات", "وكيل الدعم", "المالية"] : ["Company Admin", "Sales Manager", "Sales Agent", "Support Agent", "Finance"]).map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </form>
+      </Modal>
 
-      {/* Block User Confirmation Modal */}
-      {blockingUser && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-6 text-center space-y-4">
-              <div className="mx-auto w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-bold text-lg text-slate-800">{isAr ? "تأكيد الحظر" : "Confirm Block"}</h3>
-                <p className="text-sm text-slate-500">
-                  {isAr 
-                    ? `هل أنت متأكد من رغبتك في حظر المستخدم "${blockingUser.name}"؟ لن يتمكن من دخول النظام.`
-                    : `Are you sure you want to block user "${blockingUser.name}"? They will not be able to login.`}
-                </p>
-              </div>
-            </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-2 justify-center">
-              <button 
-                type="button" 
-                onClick={() => setBlockingUser(null)} 
-                className="btn-outline w-24 cursor-pointer"
-              >
-                {isAr ? "إلغاء" : "Cancel"}
-              </button>
-              <button 
-                type="button" 
-                onClick={handleBlockConfirm} 
-                className="btn-danger w-24 bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-              >
-                {isAr ? "حظر" : "Block"}
-              </button>
-            </div>
-          </div>
+      {/* Block User Modal */}
+      <Modal
+        isOpen={!!blockingUser}
+        onClose={() => setBlockingUser(null)}
+        title={isAr ? "تأكيد الحظر" : "Confirm Block"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button onClick={() => setBlockingUser(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={handleBlockConfirm} className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl shadow-lg shadow-red-500/30 transition-all">{isAr ? "حظر" : "Block"}</button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center justify-center text-center py-4">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4"><AlertTriangle className="w-8 h-8" /></div>
+          <h3 className="text-lg font-bold text-slate-900 mb-2">{isAr ? "هل أنت متأكد؟" : "Are you sure?"}</h3>
+          <p className="text-slate-500">{isAr ? `سيتم حظر "‏${blockingUser?.name}" ولن يتمكن من دخول النظام.` : `User "${blockingUser?.name}" will be blocked and cannot login.`}</p>
         </div>
-      )}
+      </Modal>
 
       {/* Toast Notification */}
       {toast && (

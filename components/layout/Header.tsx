@@ -109,7 +109,7 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
       <div className="flex items-center gap-2 md:gap-4">
         {/* Search */}
         <div className="relative hidden lg:block">
-          <Search strokeWidth={1.5} className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors z-10`} />
+          <Search strokeWidth={1.5} className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 transition-colors z-10 ${isSearchFocused ? 'text-[var(--primary)]' : ''}`} />
           <input
             type="text"
             placeholder={t("header.search")}
@@ -117,104 +117,130 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-            className={`w-[400px] py-2 bg-slate-50 rounded-full border border-slate-200 text-slate-700 text-sm focus:outline-none focus:bg-white focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-all ${isRtl ? 'pr-11 pl-4' : 'pl-11 pr-4'}`}
+            className={`w-[320px] xl:w-[440px] py-2.5 bg-slate-50 rounded-xl border text-slate-700 text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)]/40 transition-all placeholder:text-slate-400 ${
+              isSearchFocused ? 'border-[var(--primary)]/30 shadow-sm' : 'border-slate-200'
+            } ${isRtl ? 'pr-11 pl-4' : 'pl-11 pr-4'}`}
           />
+          {!isSearchFocused && !searchQuery && (
+            <div className={`absolute ${isRtl ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 hidden xl:flex items-center gap-1`}>
+              <kbd className="text-[10px] font-bold text-slate-300 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded">⌘</kbd>
+              <kbd className="text-[10px] font-bold text-slate-300 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded">K</kbd>
+            </div>
+          )}
 
-          {/* Floating Search Results Modal */}
+          {/* Floating Search Results */}
           {isSearchFocused && searchQuery && (
-            <div className={`absolute top-full mt-3 w-[500px] bg-white border border-slate-100 rounded-2xl shadow-2xl max-h-[400px] overflow-y-auto ${isRtl ? 'left-0' : 'right-0'} z-50 animate-in fade-in slide-in-from-top-2 duration-200 py-2`}>
-              <div className="px-4 py-2 border-b border-slate-50 flex items-center justify-between text-xs text-slate-400 font-semibold">
-                <span>{isRtl ? "نتائج البحث" : "Search Results"}</span>
-                <span>{totalResults} {isRtl ? "نتائج" : "results"}</span>
+            <div className={`absolute top-full mt-2 w-[480px] bg-white border border-slate-100 rounded-2xl shadow-2xl shadow-slate-200/80 max-h-[420px] overflow-y-auto ${
+              isRtl ? 'left-0' : 'right-0'
+            } z-50`}>
+              {/* Header */}
+              <div className="px-4 py-3 border-b border-slate-50 flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{isRtl ? "نتائج البحث" : "Search Results"}</span>
+                <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">
+                  {totalResults} {isRtl ? "نتيجة" : "results"}
+                </span>
               </div>
-              
+
               {totalResults === 0 ? (
-                <div className="p-8 text-center text-slate-400 text-sm">
-                  {isRtl ? "لا توجد نتائج مطابقة لبحثك." : "No matching results found."}
+                <div className="p-10 text-center">
+                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Search className="w-5 h-5 text-slate-300" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-500">{isRtl ? "لا توجد نتائج مطابقة" : "No matching results"}</p>
+                  <p className="text-xs text-slate-400 mt-1">{isRtl ? `بحثت عن "${searchQuery}"` : `Searched for "${searchQuery}"`}</p>
                 </div>
               ) : (
-                <div className="p-2 space-y-3">
-                  {/* Leads Section */}
+                <div className="p-2">
+                  {/* Leads */}
                   {filteredLeads.length > 0 && (
-                    <div>
-                      <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {isRtl ? "العملاء المحتملين" : "Leads"}
+                    <div className="mb-2">
+                      <div className="px-3 py-2 flex items-center gap-2">
+                        <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
+                          <User strokeWidth={2} className="w-2.5 h-2.5 text-blue-600" />
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{isRtl ? "العملاء المحتملين" : "Leads"}</span>
                       </div>
-                      <div className="mt-1 space-y-1">
+                      <div className="space-y-0.5">
                         {filteredLeads.map((lead) => (
-                          <div 
-                            key={lead.id} 
+                          <div
+                            key={lead.id}
                             onMouseDown={() => handleNavigate(`/leads`)}
-                            className="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors"
+                            className="flex items-center justify-between px-3 py-2.5 hover:bg-blue-50/50 rounded-xl cursor-pointer transition-colors group"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm">
+                              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
                                 {lead.name.charAt(0)}
                               </div>
-                              <div className="text-right">
-                                <div className="text-sm font-semibold text-slate-700">{lead.name}</div>
-                                <div className="text-xs text-slate-400">{lead.email} | {lead.phone}</div>
+                              <div>
+                                <div className="text-sm font-semibold text-slate-700 group-hover:text-blue-700">{lead.name}</div>
+                                <div className="text-xs text-slate-400">{lead.email} · {lead.phone}</div>
                               </div>
                             </div>
-                            <span className="badge badge-info">{lead.stage}</span>
+                            <span className="badge badge-info text-[10px]">{lead.stage}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Customers Section */}
+                  {/* Customers */}
                   {filteredCustomers.length > 0 && (
-                    <div>
-                      <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {isRtl ? "العملاء الدائمين" : "Customers"}
+                    <div className="mb-2">
+                      <div className="px-3 py-2 flex items-center gap-2">
+                        <div className="w-4 h-4 bg-emerald-100 rounded flex items-center justify-center">
+                          <CheckSquare strokeWidth={2} className="w-2.5 h-2.5 text-emerald-600" />
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{isRtl ? "العملاء الدائمين" : "Customers"}</span>
                       </div>
-                      <div className="mt-1 space-y-1">
+                      <div className="space-y-0.5">
                         {filteredCustomers.map((cust) => (
-                          <div 
-                            key={cust.id} 
+                          <div
+                            key={cust.id}
                             onMouseDown={() => handleNavigate(`/customers`)}
-                            className="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors"
+                            className="flex items-center justify-between px-3 py-2.5 hover:bg-emerald-50/50 rounded-xl cursor-pointer transition-colors group"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
                                 {cust.name.charAt(0)}
                               </div>
-                              <div className="text-right">
-                                <div className="text-sm font-semibold text-slate-700">{cust.name}</div>
-                                <div className="text-xs text-slate-400">{cust.contact} | {cust.email}</div>
+                              <div>
+                                <div className="text-sm font-semibold text-slate-700 group-hover:text-emerald-700">{cust.name}</div>
+                                <div className="text-xs text-slate-400">{cust.contact} · {cust.email}</div>
                               </div>
                             </div>
-                            <span className="badge badge-success">{cust.status}</span>
+                            <span className="badge badge-success text-[10px]">{cust.status}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* Tasks Section */}
+                  {/* Tasks */}
                   {filteredTasks.length > 0 && (
                     <div>
-                      <div className="px-3 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        {isRtl ? "المهام" : "Tasks"}
+                      <div className="px-3 py-2 flex items-center gap-2">
+                        <div className="w-4 h-4 bg-amber-100 rounded flex items-center justify-center">
+                          <CheckSquare strokeWidth={2} className="w-2.5 h-2.5 text-amber-600" />
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{isRtl ? "المهام" : "Tasks"}</span>
                       </div>
-                      <div className="mt-1 space-y-1">
+                      <div className="space-y-0.5">
                         {filteredTasks.map((task) => (
-                          <div 
-                            key={task.id} 
+                          <div
+                            key={task.id}
                             onMouseDown={() => handleNavigate(`/tasks`)}
-                            className="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors"
+                            className="flex items-center justify-between px-3 py-2.5 hover:bg-amber-50/50 rounded-xl cursor-pointer transition-colors group"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                                <CheckSquare className="w-4 h-4" />
+                              <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                                <CheckSquare strokeWidth={1.5} className="w-4 h-4 text-amber-600" />
                               </div>
-                              <div className="text-right">
-                                <div className="text-sm font-semibold text-slate-700 truncate max-w-[280px]">{task.title}</div>
+                              <div>
+                                <div className="text-sm font-semibold text-slate-700 group-hover:text-amber-700 truncate max-w-[250px]">{task.title}</div>
                                 <div className="text-xs text-slate-400">{isRtl ? "العميل: " : "Lead: "}{task.lead}</div>
                               </div>
                             </div>
-                            <span className="text-xs text-slate-400">{task.due}</span>
+                            <span className="text-xs font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">{task.due}</span>
                           </div>
                         ))}
                       </div>
@@ -344,7 +370,13 @@ export default function Header({ onMenuClick }: { onMenuClick: () => void }) {
                 </button>
               </div>
               <div className="border-t border-slate-50 py-2">
-                <button className="w-full px-5 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-4 justify-start text-start transition-colors">
+                <button 
+                  onClick={() => {
+                    document.cookie = "isAuthenticated=; path=/; max-age=0;";
+                    window.location.href = `/${locale}/login`;
+                  }}
+                  className="w-full px-5 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-4 justify-start text-start transition-colors"
+                >
                   <LogOut strokeWidth={1.5} className={`w-4 h-4 text-red-500 ${isRtl ? 'rotate-180' : ''}`} />
                   <span className="font-bold">{t("header.logout")}</span>
                 </button>

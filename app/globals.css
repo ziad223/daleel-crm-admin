@@ -203,3 +203,9 @@ html[dir="rtl"] select.input {
   padding-left: 2.75rem !important;
   padding-right: 1rem !important;
 }
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

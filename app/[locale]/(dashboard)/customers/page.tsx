@@ -5,6 +5,8 @@ import { Search, Filter, Plus, MoreHorizontal, Mail, Phone, Edit, Trash2, FileTe
 import { getMockData } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
+import { Modal } from "@/components/ui/modal";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function CustomersPage() {
   const t = useTranslations();
@@ -243,9 +245,15 @@ export default function CustomersPage() {
       </div>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
+      {filteredCustomers.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <EmptyState isSearch={search.length > 0} searchQuery={search} />
+        </div>
+      ) : (
+        <>
+          <div className="table-container mt-4">
+            <table className="data-table">
+              <thead>
             <tr>
               <th className="w-12 text-center">#</th>
               <th>{t("customers.tableCompany")}</th>
@@ -322,297 +330,270 @@ export default function CustomersPage() {
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center text-sm text-slate-500">
-          <div>
-            {isAr 
-              ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredCustomers.length)} - ${Math.min(currentPage * pageSize, filteredCustomers.length)} من أصل ${filteredCustomers.length} عملاء`
-              : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredCustomers.length)} - ${Math.min(currentPage * pageSize, filteredCustomers.length)} of ${filteredCustomers.length} customers`
-            }
-          </div>
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "السابق" : "Prev"}
-            </button>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "التالي" : "Next"}
-            </button>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-sm text-slate-500 mt-4">
+            <div>
+              {isAr 
+                ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredCustomers.length)} - ${Math.min(currentPage * pageSize, filteredCustomers.length)} من أصل ${filteredCustomers.length} عملاء`
+                : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredCustomers.length)} - ${Math.min(currentPage * pageSize, filteredCustomers.length)} of ${filteredCustomers.length} customers`
+              }
+            </div>
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "السابق" : "Prev"}
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "التالي" : "Next"}
+              </button>
+            </div>
+          </div>
+        )}
+      </>
       )}
 
       {/* Add Customer Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-800">{isAr ? "إضافة عميل دائم جديد" : "Add New Customer"}</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title={isAr ? "إضافة عميل دائم جديد" : "Add New Customer"}
+        maxWidth="lg"
+        footer={
+          <>
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100  :bg-slate-800 rounded-xl transition-colors">
+              {isAr ? "إلغاء" : "Cancel"}
+            </button>
+            <button onClick={() => (document.getElementById('addCustomerForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">
+              {isAr ? "حفظ" : "Save"}
+            </button>
+          </>
+        }
+      >
+        <form id="addCustomerForm" onSubmit={handleAddCustomer} className="space-y-4 text-right">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم الشركة" : "Company Name"}</label>
+              <input type="text" name="name" required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
             </div>
-            <form onSubmit={handleAddCustomer} className="p-6 space-y-4 text-right">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم الشركة" : "Company Name"}</label>
-                  <input type="text" name="name" required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
-                  <input type="email" name="email" required className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الشخص المسؤول" : "Contact Person"}</label>
-                  <input type="text" name="contact" required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label>
-                  <input type="text" name="phone" required className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الخدمة / الباقة" : "Service / Plan"}</label>
-                  <input type="text" name="service" required defaultValue={isAr ? "باقة الأعمال المتكاملة" : "Enterprise Suite"} className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "إجمالي المبيعات ($)" : "Total Sales ($)"}</label>
-                  <input type="number" name="value" defaultValue={50000} className="input" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الحالة" : "Status"}</label>
-                <select name="status" className="input">
-                  <option value={isAr ? "نشط" : "Active"}>{isAr ? "نشط" : "Active"}</option>
-                  <option value={isAr ? "غير نشط" : "Inactive"}>{isAr ? "غير نشط" : "Inactive"}</option>
-                </select>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "حفظ" : "Save"}
-                </button>
-              </div>
-            </form>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
+              <input type="email" name="email" required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
           </div>
-        </div>
-      )}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الشخص المسؤول" : "Contact Person"}</label>
+              <input type="text" name="contact" required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label>
+              <input type="text" name="phone" required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الخدمة / الباقة" : "Service / Plan"}</label>
+              <input type="text" name="service" required defaultValue={isAr ? "باقة الأعمال المتكاملة" : "Enterprise Suite"} className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "إجمالي المبيعات ($)" : "Total Sales ($)"}</label>
+              <input type="number" name="value" defaultValue={50000} className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الحالة" : "Status"}</label>
+            <select name="status" className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+              <option value={isAr ? "نشط" : "Active"}>{isAr ? "نشط" : "Active"}</option>
+              <option value={isAr ? "غير نشط" : "Inactive"}>{isAr ? "غير نشط" : "Inactive"}</option>
+            </select>
+          </div>
+        </form>
+      </Modal>
 
       {/* Edit Customer Modal */}
-      {editingCustomer && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-800">{isAr ? "تعديل بيانات العميل" : "Edit Customer Details"}</h3>
-              <button onClick={() => setEditingCustomer(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
+      <Modal
+        isOpen={!!editingCustomer}
+        onClose={() => setEditingCustomer(null)}
+        title={isAr ? "تعديل بيانات العميل" : "Edit Customer Details"}
+        maxWidth="lg"
+        footer={
+          <>
+            <button type="button" onClick={() => setEditingCustomer(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100  :bg-slate-800 rounded-xl transition-colors">
+              {isAr ? "إلغاء" : "Cancel"}
+            </button>
+            <button onClick={() => (document.getElementById('editCustomerForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">
+              {isAr ? "حفظ التعديلات" : "Save Changes"}
+            </button>
+          </>
+        }
+      >
+        <form id="editCustomerForm" onSubmit={handleEditCustomerSubmit} className="space-y-4 text-right">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم الشركة" : "Company Name"}</label>
+              <input type="text" name="name" defaultValue={editingCustomer?.name} required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
             </div>
-            <form onSubmit={handleEditCustomerSubmit} className="p-6 space-y-4 text-right">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم الشركة" : "Company Name"}</label>
-                  <input type="text" name="name" defaultValue={editingCustomer.name} required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
-                  <input type="email" name="email" defaultValue={editingCustomer.email} required className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الشخص المسؤول" : "Contact Person"}</label>
-                  <input type="text" name="contact" defaultValue={editingCustomer.contact} required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label>
-                  <input type="text" name="phone" defaultValue={editingCustomer.phone} required className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الخدمة / الباقة" : "Service / Plan"}</label>
-                  <input type="text" name="service" defaultValue={editingCustomer.service} required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "إجمالي المبيعات ($)" : "Total Sales ($)"}</label>
-                  <input type="number" name="value" defaultValue={editingCustomer.value} className="input" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الحالة" : "Status"}</label>
-                <select name="status" defaultValue={editingCustomer.status} className="input">
-                  <option value={isAr ? "نشط" : "Active"}>{isAr ? "نشط" : "Active"}</option>
-                  <option value={isAr ? "غير نشط" : "Inactive"}>{isAr ? "غير نشط" : "Inactive"}</option>
-                </select>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setEditingCustomer(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "حفظ التعديلات" : "Save Changes"}
-                </button>
-              </div>
-            </form>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
+              <input type="email" name="email" defaultValue={editingCustomer?.email} required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
           </div>
-        </div>
-      )}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الشخص المسؤول" : "Contact Person"}</label>
+              <input type="text" name="contact" defaultValue={editingCustomer?.contact} required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label>
+              <input type="text" name="phone" defaultValue={editingCustomer?.phone} required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الخدمة / الباقة" : "Service / Plan"}</label>
+              <input type="text" name="service" defaultValue={editingCustomer?.service} required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "إجمالي المبيعات ($)" : "Total Sales ($)"}</label>
+              <input type="number" name="value" defaultValue={editingCustomer?.value} className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الحالة" : "Status"}</label>
+            <select name="status" defaultValue={editingCustomer?.status} className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+              <option value={isAr ? "نشط" : "Active"}>{isAr ? "نشط" : "Active"}</option>
+              <option value={isAr ? "غير نشط" : "Inactive"}>{isAr ? "غير نشط" : "Inactive"}</option>
+            </select>
+          </div>
+        </form>
+      </Modal>
 
       {/* Add Service Modal */}
-      {addingServiceCustomer && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-md text-slate-800">{isAr ? "إضافة خدمة أو باقة جديدة" : "Add Service / Plan"}</h3>
-              <button onClick={() => setAddingServiceCustomer(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleAddServiceSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم الخدمة / الباقة الجديدة" : "Service/Plan Name"}</label>
-                <input type="text" name="service" required className="input" placeholder={isAr ? "مثال: دعم فني إضافي" : "e.g. Extra Support"} />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "سعر الخدمة ($)" : "Price ($)"}</label>
-                <input type="number" name="price" defaultValue={500} required className="input" />
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setAddingServiceCustomer(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "إضافة" : "Add"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={!!addingServiceCustomer}
+        onClose={() => setAddingServiceCustomer(null)}
+        title={isAr ? "إضافة خدمة أو باقة جديدة" : "Add Service / Plan"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setAddingServiceCustomer(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100  :bg-slate-800 rounded-xl transition-colors">
+              {isAr ? "إلغاء" : "Cancel"}
+            </button>
+            <button onClick={() => (document.getElementById('addServiceForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">
+              {isAr ? "إضافة" : "Add"}
+            </button>
+          </>
+        }
+      >
+        <form id="addServiceForm" onSubmit={handleAddServiceSubmit} className="space-y-4 text-right">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "اسم الخدمة / الباقة الجديدة" : "Service/Plan Name"}</label>
+            <input type="text" name="service" required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder={isAr ? "مثال: دعم فني إضافي" : "e.g. Extra Support"} />
           </div>
-        </div>
-      )}
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "سعر الخدمة ($)" : "Price ($)"}</label>
+            <input type="number" name="price" defaultValue={500} required className="w-full px-4 py-2.5 bg-slate-50  border border-slate-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+          </div>
+        </form>
+      </Modal>
 
       {/* Invoices List Modal */}
-      {viewingInvoicesCustomer && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-2xl w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-slate-500" />
-                <h3 className="font-bold text-lg text-slate-800 font-sans">
-                  {isAr ? `فواتير العميل: ${viewingInvoicesCustomer.name}` : `Invoices: ${viewingInvoicesCustomer.name}`}
-                </h3>
-              </div>
-              <button onClick={() => setViewingInvoicesCustomer(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto">
-              <table className="w-full text-right text-sm">
-                <thead>
-                  <tr className="border-b border-slate-100 text-slate-400 font-bold">
-                    <th className="pb-3 text-right">{isAr ? "رقم الفاتورة" : "Invoice No"}</th>
-                    <th className="pb-3 text-right">{isAr ? "التاريخ" : "Date"}</th>
-                    <th className="pb-3 text-right">{isAr ? "القيمة" : "Amount"}</th>
-                    <th className="pb-3 text-right">{isAr ? "الحالة" : "Status"}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {[
-                    { no: "#INV-9023", date: "2026-06-15", amount: viewingInvoicesCustomer.value * 0.4, status: isAr ? "مدفوعة" : "Paid" },
-                    { no: "#INV-8491", date: "2026-05-10", amount: viewingInvoicesCustomer.value * 0.3, status: isAr ? "مدفوعة" : "Paid" },
-                    { no: "#INV-7230", date: "2026-04-01", amount: viewingInvoicesCustomer.value * 0.3, status: isAr ? "معلقة" : "Pending" },
-                  ].map((inv, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50/50">
-                      <td className="py-3 font-semibold text-slate-700">{inv.no}</td>
-                      <td className="py-3 text-slate-500">{inv.date}</td>
-                      <td className="py-3 font-medium text-slate-800">{formatCurrency(inv.amount)}</td>
-                      <td className="py-3">
-                        <span className={`badge ${inv.status === "مدفوعة" || inv.status === "Paid" ? "badge-success" : "badge-warning"}`}>
-                          {inv.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button 
-                onClick={() => setViewingInvoicesCustomer(null)} 
-                className="btn-primary w-24"
-              >
-                {isAr ? "إغلاق" : "Close"}
-              </button>
-            </div>
-          </div>
+      <Modal
+        isOpen={!!viewingInvoicesCustomer}
+        onClose={() => setViewingInvoicesCustomer(null)}
+        title={isAr ? `فواتير العميل: ${viewingInvoicesCustomer?.name}` : `Invoices: ${viewingInvoicesCustomer?.name}`}
+        maxWidth="2xl"
+        footer={
+          <button onClick={() => setViewingInvoicesCustomer(null)} className="px-6 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700  :bg-slate-700  font-medium rounded-xl transition-all">
+            {isAr ? "إغلاق" : "Close"}
+          </button>
+        }
+      >
+        <div className="space-y-4">
+          <table className="w-full text-right text-sm">
+            <thead>
+              <tr className="border-b border-slate-100  text-slate-400 font-bold">
+                <th className="pb-3 text-right">{isAr ? "رقم الفاتورة" : "Invoice No"}</th>
+                <th className="pb-3 text-right">{isAr ? "التاريخ" : "Date"}</th>
+                <th className="pb-3 text-right">{isAr ? "القيمة" : "Amount"}</th>
+                <th className="pb-3 text-right">{isAr ? "الحالة" : "Status"}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 ">
+              {[
+                { no: "#INV-9023", date: "2026-06-15", amount: (viewingInvoicesCustomer?.value || 0) * 0.4, status: isAr ? "مدفوعة" : "Paid" },
+                { no: "#INV-8491", date: "2026-05-10", amount: (viewingInvoicesCustomer?.value || 0) * 0.3, status: isAr ? "مدفوعة" : "Paid" },
+                { no: "#INV-7230", date: "2026-04-01", amount: (viewingInvoicesCustomer?.value || 0) * 0.3, status: isAr ? "معلقة" : "Pending" },
+              ].map((inv, idx) => (
+                <tr key={idx} className="hover:bg-slate-50/50 :bg-slate-800/50">
+                  <td className="py-3 font-semibold text-slate-700 ">{inv.no}</td>
+                  <td className="py-3 text-slate-500">{inv.date}</td>
+                  <td className="py-3 font-medium text-slate-800 ">{formatCurrency(inv.amount)}</td>
+                  <td className="py-3">
+                    <span className={`badge ${inv.status === "مدفوعة" || inv.status === "Paid" ? "badge-success" : "badge-warning"}`}>
+                      {inv.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
+      </Modal>
 
       {/* Delete Confirmation Modal */}
-      {deletingCustomer && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-6 text-center space-y-4">
-              <div className="mx-auto w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-bold text-lg text-slate-800">{isAr ? "تأكيد الحذف" : "Confirm Delete"}</h3>
-                <p className="text-sm text-slate-500">
-                  {isAr 
-                    ? `هل أنت متأكد من رغبتك في حذف العميل "${deletingCustomer.name}"؟ لا يمكن التراجع عن هذا الإجراء.`
-                    : `Are you sure you want to delete customer "${deletingCustomer.name}"? This action cannot be undone.`}
-                </p>
-              </div>
-            </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-2 justify-center">
-              <button 
-                type="button" 
-                onClick={() => setDeletingCustomer(null)} 
-                className="btn-outline w-24"
-              >
-                {isAr ? "إلغاء" : "Cancel"}
-              </button>
-              <button 
-                type="button" 
-                onClick={handleDeleteCustomerConfirm} 
-                className="btn-danger w-24 bg-red-600 text-white hover:bg-red-700"
-              >
-                {isAr ? "حذف" : "Delete"}
-              </button>
-            </div>
+      <Modal
+        isOpen={!!deletingCustomer}
+        onClose={() => setDeletingCustomer(null)}
+        title={isAr ? "تأكيد الحذف" : "Confirm Delete"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button onClick={() => setDeletingCustomer(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100  :bg-slate-800 rounded-xl transition-colors">
+              {isAr ? "إلغاء" : "Cancel"}
+            </button>
+            <button onClick={handleDeleteCustomerConfirm} className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl shadow-lg shadow-red-500/30 transition-all flex items-center gap-2">
+              {isAr ? "حذف" : "Delete"}
+            </button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center justify-center text-center py-4">
+          <div className="w-16 h-16 bg-red-100  text-red-500 rounded-full flex items-center justify-center mb-4">
+            <AlertTriangle className="w-8 h-8" />
           </div>
+          <h3 className="text-lg font-bold text-slate-900  mb-2">
+            {isAr ? "هل أنت متأكد؟" : "Are you sure?"}
+          </h3>
+          <p className="text-slate-500 ">
+            {isAr 
+              ? `هل أنت متأكد من رغبتك في حذف العميل "${deletingCustomer?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`
+              : `Are you sure you want to delete customer "${deletingCustomer?.name}"? This action cannot be undone.`}
+          </p>
         </div>
-      )}
+      </Modal>
 
       {/* Toast Notification */}
       {toast && (

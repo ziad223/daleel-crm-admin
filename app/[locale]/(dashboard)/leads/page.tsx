@@ -6,6 +6,8 @@ import { Plus, Search, Filter, Download, Upload, Phone, MessageCircle, MoreHoriz
 import { getMockData } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
+import { Modal } from "@/components/ui/modal";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function LeadsPage() {
   const t = useTranslations();
@@ -268,10 +270,16 @@ export default function LeadsPage() {
       </div>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
-            <tr>
+      {filteredLeads.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <EmptyState isSearch={search.length > 0} searchQuery={search} />
+        </div>
+      ) : (
+        <>
+          <div className="table-container mt-4">
+            <table className="data-table">
+              <thead>
+                <tr>
               <th className="w-12 text-center">#</th>
               <th>{t("leads.table.name")} / {t("leads.table.email")}</th>
               <th>{t("leads.table.phone")} / {t("leads.table.whatsapp")}</th>
@@ -386,339 +394,233 @@ export default function LeadsPage() {
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-between items-center text-sm text-slate-500">
-          <div>
-            {isAr 
-              ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredLeads.length)} - ${Math.min(currentPage * pageSize, filteredLeads.length)} من أصل ${filteredLeads.length} عملاء`
-              : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredLeads.length)} - ${Math.min(currentPage * pageSize, filteredLeads.length)} of ${filteredLeads.length} leads`
-            }
-          </div>
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "السابق" : "Prev"}
-            </button>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button 
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="btn-outline btn-sm disabled:opacity-50"
-            >
-              {isAr ? "التالي" : "Next"}
-            </button>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-sm text-slate-500 mt-4">
+            <div>
+              {isAr 
+                ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredLeads.length)} - ${Math.min(currentPage * pageSize, filteredLeads.length)} من أصل ${filteredLeads.length} عملاء`
+                : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredLeads.length)} - ${Math.min(currentPage * pageSize, filteredLeads.length)} of ${filteredLeads.length} leads`
+              }
+            </div>
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "السابق" : "Prev"}
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "التالي" : "Next"}
+              </button>
+            </div>
+          </div>
+        )}
+      </>
       )}
 
       {/* Add Lead Modal */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-800">{isAr ? "إضافة عميل محتمل جديد" : "Add New Lead"}</h3>
-              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleAddLead} className="p-6 space-y-4 text-right">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الاسم الكامل" : "Full Name"}</label>
-                  <input type="text" name="name" required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
-                  <input type="email" name="email" required className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label>
-                  <input type="text" name="phone" required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "القيمة المتوقعة ($)" : "Expected Value ($)"}</label>
-                  <input type="number" name="value" defaultValue={10000} className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المدينة" : "City"}</label>
-                  <input type="text" name="city" required defaultValue={isAr ? "دبي" : "Dubai"} className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الدولة" : "Country"}</label>
-                  <input type="text" name="country" required defaultValue={isAr ? "الإمارات" : "UAE"} className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المصدر" : "Source"}</label>
-                  <select name="source" className="input">
-                    <option value={isAr ? "إعلان فيسبوك" : "FB Ad"}>{isAr ? "إعلان فيسبوك" : "FB Ad"}</option>
-                    <option value={isAr ? "مباشر" : "Direct"}>{isAr ? "مباشر" : "Direct"}</option>
-                    <option value={isAr ? "واتساب" : "WhatsApp"}>{isAr ? "واتساب" : "WhatsApp"}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المرحلة" : "Stage"}</label>
-                  <select name="stage" className="input">
-                    <option value="New">New</option>
-                    <option value="Contacted">Contacted</option>
-                    <option value="Interested">Interested</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "درجة الاهتمام" : "Interest"}</label>
-                  <select name="interest" className="input">
-                    <option value={isAr ? "ساخن" : "Hot"}>{isAr ? "ساخن" : "Hot"}</option>
-                    <option value={isAr ? "دافئ" : "Warm"}>{isAr ? "دافئ" : "Warm"}</option>
-                    <option value={isAr ? "بارد" : "Cold"}>{isAr ? "بارد" : "Cold"}</option>
-                  </select>
-                </div>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "حفظ" : "Save"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title={isAr ? "إضافة عميل محتمل جديد" : "Add New Lead"}
+        maxWidth="lg"
+        footer={
+          <>
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('addLeadForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "حفظ" : "Save"}</button>
+          </>
+        }
+      >
+        <form id="addLeadForm" onSubmit={handleAddLead} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الاسم الكامل" : "Full Name"}</label><input type="text" name="name" required className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label><input type="email" name="email" required className="input" /></div>
           </div>
-        </div>
-      )}
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label><input type="text" name="phone" required className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "القيمة المتوقعة ($)" : "Expected Value ($)"}</label><input type="number" name="value" defaultValue={10000} className="input" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المدينة" : "City"}</label><input type="text" name="city" required defaultValue={isAr ? "دبي" : "Dubai"} className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الدولة" : "Country"}</label><input type="text" name="country" required defaultValue={isAr ? "الإمارات" : "UAE"} className="input" /></div>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المصدر" : "Source"}</label>
+              <select name="source" className="input">
+                <option value={isAr ? "إعلان فيسبوك" : "FB Ad"}>{isAr ? "إعلان فيسبوك" : "FB Ad"}</option>
+                <option value={isAr ? "مباشر" : "Direct"}>{isAr ? "مباشر" : "Direct"}</option>
+                <option value={isAr ? "واتساب" : "WhatsApp"}>{isAr ? "واتساب" : "WhatsApp"}</option>
+              </select>
+            </div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المرحلة" : "Stage"}</label>
+              <select name="stage" className="input">
+                <option value="New">New</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Interested">Interested</option>
+              </select>
+            </div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "درجة الاهتمام" : "Interest"}</label>
+              <select name="interest" className="input">
+                <option value={isAr ? "ساخن" : "Hot"}>{isAr ? "ساخن" : "Hot"}</option>
+                <option value={isAr ? "دافئ" : "Warm"}>{isAr ? "دافئ" : "Warm"}</option>
+                <option value={isAr ? "بارد" : "Cold"}>{isAr ? "بارد" : "Cold"}</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </Modal>
 
       {/* Edit Lead Modal */}
-      {editingLead && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-lg w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-lg text-slate-800">{isAr ? "تعديل بيانات العميل" : "Edit Lead Details"}</h3>
-              <button onClick={() => setEditingLead(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleEditLeadSubmit} className="p-6 space-y-4 text-right">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الاسم الكامل" : "Full Name"}</label>
-                  <input type="text" name="name" defaultValue={editingLead.name} required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
-                  <input type="email" name="email" defaultValue={editingLead.email} required className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label>
-                  <input type="text" name="phone" defaultValue={editingLead.phone} required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "القيمة ($)" : "Value ($)"}</label>
-                  <input type="number" name="value" defaultValue={editingLead.value} className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المدينة" : "City"}</label>
-                  <input type="text" name="city" defaultValue={editingLead.city} required className="input" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الدولة" : "Country"}</label>
-                  <input type="text" name="country" defaultValue={editingLead.country} required className="input" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المرحلة" : "Stage"}</label>
-                  <select name="stage" defaultValue={editingLead.stage} className="input">
-                    <option value="New">New</option>
-                    <option value="Contacted">Contacted</option>
-                    <option value="Interested">Interested</option>
-                    <option value="Follow-up">Follow-up</option>
-                    <option value="Quotation">Quotation</option>
-                    <option value="Negotiation">Negotiation</option>
-                    <option value="Won">Won</option>
-                    <option value="Lost">Lost</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "درجة الاهتمام" : "Interest"}</label>
-                  <select name="interest" defaultValue={editingLead.interest} className="input">
-                    <option value={isAr ? "ساخن" : "Hot"}>{isAr ? "ساخن" : "Hot"}</option>
-                    <option value={isAr ? "دافئ" : "Warm"}>{isAr ? "دافئ" : "Warm"}</option>
-                    <option value={isAr ? "بارد" : "Cold"}>{isAr ? "بارد" : "Cold"}</option>
-                  </select>
-                </div>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setEditingLead(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "حفظ التعديلات" : "Save Changes"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={!!editingLead}
+        onClose={() => setEditingLead(null)}
+        title={isAr ? "تعديل بيانات العميل" : "Edit Lead Details"}
+        maxWidth="lg"
+        footer={
+          <>
+            <button type="button" onClick={() => setEditingLead(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('editLeadForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "حفظ التعديلات" : "Save Changes"}</button>
+          </>
+        }
+      >
+        <form id="editLeadForm" onSubmit={handleEditLeadSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الاسم الكامل" : "Full Name"}</label><input type="text" name="name" defaultValue={editingLead?.name} required className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label><input type="email" name="email" defaultValue={editingLead?.email} required className="input" /></div>
           </div>
-        </div>
-      )}
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label><input type="text" name="phone" defaultValue={editingLead?.phone} required className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "القيمة ($)" : "Value ($)"}</label><input type="number" name="value" defaultValue={editingLead?.value} className="input" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المدينة" : "City"}</label><input type="text" name="city" defaultValue={editingLead?.city} required className="input" /></div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الدولة" : "Country"}</label><input type="text" name="country" defaultValue={editingLead?.country} required className="input" /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "المرحلة" : "Stage"}</label>
+              <select name="stage" defaultValue={editingLead?.stage} className="input">
+                {["New","Contacted","Interested","Follow-up","Quotation","Negotiation","Won","Lost"].map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "درجة الاهتمام" : "Interest"}</label>
+              <select name="interest" defaultValue={editingLead?.interest} className="input">
+                <option value={isAr ? "ساخن" : "Hot"}>{isAr ? "ساخن" : "Hot"}</option>
+                <option value={isAr ? "دافئ" : "Warm"}>{isAr ? "دافئ" : "Warm"}</option>
+                <option value={isAr ? "بارد" : "Cold"}>{isAr ? "بارد" : "Cold"}</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </Modal>
 
       {/* Assign Modal */}
-      {assigningLead && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-md text-slate-800">{isAr ? "نقل المتابعة إلى موظف" : "Assign to Employee"}</h3>
-              <button onClick={() => setAssigningLead(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleAssignLeadSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-2">{isAr ? "اختر الموظف المسؤول" : "Select Assignee"}</label>
-                <select name="employee" defaultValue={assigningLead.agent} className="input">
-                  {["أحمد", "سارة", "خالد", "نورة", "محمد", "Ahmed", "Sarah", "Khalid", "Noura", "Mohammed"].map((emp) => (
-                    <option key={emp} value={emp}>{emp}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setAssigningLead(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "تعيين" : "Assign"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={!!assigningLead}
+        onClose={() => setAssigningLead(null)}
+        title={isAr ? "نقل المتابعة إلى موظف" : "Assign to Employee"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setAssigningLead(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('assignForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "تعيين" : "Assign"}</button>
+          </>
+        }
+      >
+        <form id="assignForm" onSubmit={handleAssignLeadSubmit}>
+          <label className="block text-xs font-semibold text-slate-500 mb-2">{isAr ? "اختر الموظف المسؤول" : "Select Assignee"}</label>
+          <select name="employee" defaultValue={assigningLead?.agent} className="input">
+            {[isAr?'أحمد':'Ahmed', isAr?'سارة':'Sarah', isAr?'خالد':'Khalid', isAr?'نورة':'Noura', isAr?'محمد':'Mohammed'].map(e => <option key={e} value={e}>{e}</option>)}
+          </select>
+        </form>
+      </Modal>
 
       {/* Change Stage Modal */}
-      {changingStageLead && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-md text-slate-800">{isAr ? "تغيير مرحلة العميل" : "Change Lead Stage"}</h3>
-              <button onClick={() => setChangingStageLead(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleChangeStageSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-2">{isAr ? "اختر المرحلة الجديدة" : "Select Stage"}</label>
-                <select name="stage" defaultValue={changingStageLead.stage} className="input">
-                  {["New", "Contacted", "Interested", "Follow-up", "Quotation", "Negotiation", "Won", "Lost"].map((stg) => (
-                    <option key={stg} value={stg}>{stg}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setChangingStageLead(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "تحديث" : "Update"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={!!changingStageLead}
+        onClose={() => setChangingStageLead(null)}
+        title={isAr ? "تغيير مرحلة العميل" : "Change Lead Stage"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setChangingStageLead(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('stageForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "تحديث" : "Update"}</button>
+          </>
+        }
+      >
+        <form id="stageForm" onSubmit={handleChangeStageSubmit}>
+          <label className="block text-xs font-semibold text-slate-500 mb-2">{isAr ? "اختر المرحلة الجديدة" : "Select Stage"}</label>
+          <select name="stage" defaultValue={changingStageLead?.stage} className="input">
+            {["New","Contacted","Interested","Follow-up","Quotation","Negotiation","Won","Lost"].map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </form>
+      </Modal>
 
       {/* Add Task/Note Modal */}
-      {addTaskLead && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-md w-full overflow-hidden z-50">
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-bold text-md text-slate-800">{isAr ? "إضافة مهمة أو ملاحظة للعميل" : "Add Task / Note to Lead"}</h3>
-              <button onClick={() => setAddTaskLead(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleAddTaskSubmit} className="p-6 space-y-4 text-right">
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "العميل" : "Lead"}</label>
-                <input type="text" disabled defaultValue={addTaskLead.name} className="input bg-slate-50 text-slate-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الملاحظة / تفاصيل المهمة" : "Note / Task Description"}</label>
-                <textarea required rows={4} className="input resize-none py-2" placeholder={isAr ? "اكتب الملاحظة هنا..." : "Write details..."}></textarea>
-              </div>
-              <div className="border-t border-slate-100 pt-4 flex gap-2 justify-end">
-                <button type="button" onClick={() => setAddTaskLead(null)} className="btn-outline">
-                  {isAr ? "إلغاء" : "Cancel"}
-                </button>
-                <button type="submit" className="btn-accent">
-                  {isAr ? "إضافة" : "Add"}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={!!addTaskLead}
+        onClose={() => setAddTaskLead(null)}
+        title={isAr ? "إضافة مهمة أو ملاحظة" : "Add Task / Note"}
+        maxWidth="md"
+        footer={
+          <>
+            <button type="button" onClick={() => setAddTaskLead(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('taskForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "إضافة" : "Add"}</button>
+          </>
+        }
+      >
+        <form id="taskForm" onSubmit={handleAddTaskSubmit} className="space-y-4">
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "العميل" : "Lead"}</label>
+            <input type="text" disabled defaultValue={addTaskLead?.name} className="input bg-slate-50 text-slate-500" />
           </div>
-        </div>
-      )}
-
-
+          <div><label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الملاحظة / تفاصيل المهمة" : "Note / Task Description"}</label>
+            <textarea required rows={4} className="input resize-none py-2" placeholder={isAr ? "اكتب الملاحظة هنا..." : "Write details..."}></textarea>
+          </div>
+        </form>
+      </Modal>
 
       {/* Delete Confirmation Modal */}
-      {deletingLead && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl max-w-sm w-full overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-6 text-center space-y-4">
-              <div className="mx-auto w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h3 className="font-bold text-lg text-slate-800">{isAr ? "تأكيد الحذف" : "Confirm Delete"}</h3>
-                <p className="text-sm text-slate-500">
-                  {isAr 
-                    ? `هل أنت متأكد من رغبتك في حذف العميل "${deletingLead.name}"؟ لا يمكن التراجع عن هذا الإجراء.`
-                    : `Are you sure you want to delete lead "${deletingLead.name}"? This action cannot be undone.`}
-                </p>
-              </div>
-            </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-2 justify-center">
-              <button 
-                type="button" 
-                onClick={() => setDeletingLead(null)} 
-                className="btn-outline w-24"
-              >
-                {isAr ? "إلغاء" : "Cancel"}
-              </button>
-              <button 
-                type="button" 
-                onClick={handleDeleteLeadConfirm} 
-                className="btn-danger w-24 bg-red-600 text-white hover:bg-red-700"
-              >
-                {isAr ? "حذف" : "Delete"}
-              </button>
-            </div>
+      <Modal
+        isOpen={!!deletingLead}
+        onClose={() => setDeletingLead(null)}
+        title={isAr ? "تأكيد الحذف" : "Confirm Delete"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button onClick={() => setDeletingLead(null)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={handleDeleteLeadConfirm} className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl shadow-lg shadow-red-500/30 transition-all">{isAr ? "حذف" : "Delete"}</button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center justify-center text-center py-4">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
+            <AlertTriangle className="w-8 h-8" />
           </div>
+          <h3 className="text-lg font-bold text-slate-900 mb-2">{isAr ? "هل أنت متأكد؟" : "Are you sure?"}</h3>
+          <p className="text-slate-500">
+            {isAr ? `سيتم حذف "د${deletingLead?.name}"، لا يمكن التراجع عن هذا.` : `Lead "${deletingLead?.name}" will be permanently deleted.`}
+          </p>
         </div>
-      )}
+      </Modal>
 
       {/* Toast Notification */}
       {toast && (
@@ -729,4 +631,4 @@ export default function LeadsPage() {
       )}
     </div>
   );
-}
+}

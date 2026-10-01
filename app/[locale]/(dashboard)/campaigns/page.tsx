@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Search, Filter, MoreHorizontal, BarChart3, Users, Play, Square, Edit, Trash2, X, AlertTriangle } from "lucide-react";
 import { getMockData } from "@/lib/mock-data";
 import { useLocale } from "next-intl";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function CampaignsPage() {
   const locale = useLocale();
@@ -174,10 +175,16 @@ export default function CampaignsPage() {
       </div>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
-            <tr>
+      {filteredCampaigns.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <EmptyState isSearch={search.length > 0} searchQuery={search} />
+        </div>
+      ) : (
+        <>
+          <div className="table-container mt-4">
+            <table className="data-table">
+              <thead>
+                <tr>
               <th className="w-12 text-center">#</th>
               <th>{isAr ? "اسم الحملة" : "Campaign Name"}</th>
               <th>{isAr ? "المصدر" : "Source"}</th>
@@ -277,45 +284,49 @@ export default function CampaignsPage() {
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      {/* Pagination */}
-      <div className="flex justify-between items-center text-sm text-slate-500">
-        <div>
-          {isAr 
-            ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredCampaigns.length)} - ${Math.min(currentPage * pageSize, filteredCampaigns.length)} من أصل ${filteredCampaigns.length} حملات`
-            : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredCampaigns.length)} - ${Math.min(currentPage * pageSize, filteredCampaigns.length)} of ${filteredCampaigns.length} campaigns`
-          }
-        </div>
-        <div className="flex gap-1">
-          <button 
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="btn-outline btn-sm disabled:opacity-50"
-          >
-            {isAr ? "السابق" : "Prev"}
-          </button>
-          {Array.from({ length: totalPages }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button 
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="btn-outline btn-sm disabled:opacity-50"
-          >
-            {isAr ? "التالي" : "Next"}
-          </button>
-        </div>
-      </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center text-sm text-slate-500 mt-4">
+            <div>
+              {isAr 
+                ? `عرض ${Math.min((currentPage - 1) * pageSize + 1, filteredCampaigns.length)} - ${Math.min(currentPage * pageSize, filteredCampaigns.length)} من أصل ${filteredCampaigns.length} حملات`
+                : `Showing ${Math.min((currentPage - 1) * pageSize + 1, filteredCampaigns.length)} - ${Math.min(currentPage * pageSize, filteredCampaigns.length)} of ${filteredCampaigns.length} campaigns`
+              }
+            </div>
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "السابق" : "Prev"}
+              </button>
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`${currentPage === i + 1 ? "btn-primary" : "btn-outline"} btn-sm`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="btn-outline btn-sm disabled:opacity-50"
+              >
+                {isAr ? "التالي" : "Next"}
+              </button>
+            </div>
+          </div>
+        )}
+      </>
+      )}
 
       {/* Add Campaign Modal */}
       {isAddModalOpen && (

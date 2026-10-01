@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Plus, MoreHorizontal, Mail, Phone, MapPin, Award, Target, TrendingUp, Users } from "lucide-react";
+import { Search, Plus, MoreHorizontal, Mail, Phone, MapPin, Award, Target, TrendingUp, Users, X } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { Modal } from "@/components/ui/modal";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default function TeamPage() {
   const t = useTranslations();
@@ -11,14 +13,47 @@ export default function TeamPage() {
   const isRtl = locale === 'ar';
 
   const [search, setSearch] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [toast, setToast] = useState<{message: string} | null>(null);
 
-  const team = [
+  const [teamData, setTeamData] = useState([
     { id: 1, name: "أحمد محمد", role: "Sales Manager", email: "ahmed@daleel.com", phone: "+971501112222", activeLeads: 45, wonDeals: 12, conversionRate: "28%", avatar: "أ" },
     { id: 2, name: "سارة عبدالله", role: "Senior Sales Agent", email: "sarah@daleel.com", phone: "+971503334444", activeLeads: 82, wonDeals: 18, conversionRate: "35%", avatar: "س" },
     { id: 3, name: "خالد سعيد", role: "Sales Agent", email: "khalid@daleel.com", phone: "+971505556666", activeLeads: 30, wonDeals: 5, conversionRate: "15%", avatar: "خ" },
     { id: 4, name: "نورة علي", role: "Sales Agent", email: "noura@daleel.com", phone: "+971507778888", activeLeads: 65, wonDeals: 14, conversionRate: "22%", avatar: "ن" },
     { id: 5, name: "محمد حسن", role: "Sales Agent", email: "mohammed@daleel.com", phone: "+971509990000", activeLeads: 40, wonDeals: 8, conversionRate: "18%", avatar: "م" },
-  ];
+  ]);
+
+  const showToast = (message: string) => {
+    setToast({ message });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const filteredTeam = teamData.filter(member => 
+    member.name.toLowerCase().includes(search.toLowerCase()) || 
+    member.role.toLowerCase().includes(search.toLowerCase()) ||
+    member.email.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleAddAgent = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newName = formData.get("name") as string;
+    const newAgent = {
+      id: Date.now(),
+      name: newName,
+      role: formData.get("role") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
+      activeLeads: 0,
+      wonDeals: 0,
+      conversionRate: "0%",
+      avatar: newName.substring(0, 1)
+    };
+    setTeamData(prev => [newAgent, ...prev]);
+    setIsAddModalOpen(false);
+    showToast(isAr ? "تم إضافة الموظف بنجاح!" : "Agent added successfully!");
+  };
 
   return (
     <div className="space-y-6 pb-10">
@@ -28,7 +63,7 @@ export default function TeamPage() {
           <h2 className="text-2xl font-bold text-slate-800">{isAr ? "فريق المبيعات" : "Sales Team"}</h2>
           <p className="text-sm text-slate-500">{isAr ? "إدارة ومتابعة أداء موظفي المبيعات" : "Manage and track sales team performance"}</p>
         </div>
-        <button className="btn-accent">
+        <button onClick={() => setIsAddModalOpen(true)} className="btn-accent">
           <Plus className="w-4 h-4" />
           {isAr ? "إضافة موظف مبيعات" : "Add Sales Agent"}
         </button>
@@ -92,57 +127,108 @@ export default function TeamPage() {
       </div>
 
       {/* Team Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {team.map((member) => (
-          <div key={member.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-16 h-16 rounded-full bg-slate-100 text-[var(--primary)] text-2xl font-bold flex items-center justify-center border-4 border-white shadow-sm">
-                  {member.avatar}
+      {filteredTeam.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <EmptyState isSearch={search.length > 0} searchQuery={search} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredTeam.map((member) => (
+            <div key={member.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-16 h-16 rounded-full bg-slate-100 text-[var(--primary)] text-2xl font-bold flex items-center justify-center border-4 border-white shadow-sm">
+                    {member.avatar}
+                  </div>
+                  <button className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-colors">
+                    <MoreHorizontal className="w-5 h-5" />
+                  </button>
                 </div>
-                <button className="p-2 hover:bg-slate-50 rounded-xl text-slate-400 transition-colors">
-                  <MoreHorizontal className="w-5 h-5" />
+                
+                <h3 className="text-lg font-bold text-slate-800">{member.name}</h3>
+                <p className="text-sm font-medium text-[var(--primary)] mb-4">{member.role}</p>
+                
+                <div className="space-y-2 mb-6">
+                  <div className="flex items-center gap-3 text-sm text-slate-600">
+                    <Mail className="w-4 h-4 text-slate-400" /> {member.email}
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-slate-600">
+                    <Phone className="w-4 h-4 text-slate-400" /> <span dir="ltr">{member.phone}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 py-4 border-t border-slate-100">
+                  <div className="text-center">
+                    <div className="text-xs font-semibold text-slate-400 uppercase">{isAr ? "العملاء" : "Leads"}</div>
+                    <div className="font-bold text-slate-800 mt-1">{member.activeLeads}</div>
+                  </div>
+                  <div className="text-center border-x border-slate-100">
+                    <div className="text-xs font-semibold text-slate-400 uppercase">{isAr ? "مغلقة" : "Won"}</div>
+                    <div className="font-bold text-emerald-600 mt-1">{member.wonDeals}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xs font-semibold text-slate-400 uppercase">{isAr ? "نسبة التحويل" : "Win Rate"}</div>
+                    <div className="font-bold text-[var(--primary)] mt-1">{member.conversionRate}</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex gap-2">
+                <button className="flex-1 btn-outline bg-white justify-center text-slate-700">
+                  {isAr ? "تعديل" : "Edit"}
+                </button>
+                <button className="flex-1 btn-primary justify-center">
+                  {isAr ? "التقارير" : "Reports"}
                 </button>
               </div>
-              
-              <h3 className="text-lg font-bold text-slate-800">{member.name}</h3>
-              <p className="text-sm font-medium text-[var(--primary)] mb-4">{member.role}</p>
-              
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center gap-3 text-sm text-slate-600">
-                  <Mail className="w-4 h-4 text-slate-400" /> {member.email}
-                </div>
-                <div className="flex items-center gap-3 text-sm text-slate-600">
-                  <Phone className="w-4 h-4 text-slate-400" /> <span dir="ltr">{member.phone}</span>
-                </div>
-              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-              <div className="grid grid-cols-3 gap-2 py-4 border-t border-slate-100">
-                <div className="text-center">
-                  <div className="text-xs font-semibold text-slate-400 uppercase">{isAr ? "العملاء" : "Leads"}</div>
-                  <div className="font-bold text-slate-800 mt-1">{member.activeLeads}</div>
-                </div>
-                <div className="text-center border-x border-slate-100">
-                  <div className="text-xs font-semibold text-slate-400 uppercase">{isAr ? "مغلقة" : "Won"}</div>
-                  <div className="font-bold text-emerald-600 mt-1">{member.wonDeals}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-xs font-semibold text-slate-400 uppercase">{isAr ? "نسبة التحويل" : "Win Rate"}</div>
-                  <div className="font-bold text-[var(--primary)] mt-1">{member.conversionRate}</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex gap-2">
-              <button className="flex-1 btn-outline bg-white justify-center text-slate-700">
-                {isAr ? "تعديل" : "Edit"}
-              </button>
-              <button className="flex-1 btn-primary justify-center">
-                {isAr ? "التقارير" : "Reports"}
-              </button>
-            </div>
+      {/* Add Agent Modal */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title={isAr ? "إضافة موظف جديد" : "Add New Agent"}
+        maxWidth="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">{isAr ? "إلغاء" : "Cancel"}</button>
+            <button onClick={() => (document.getElementById('addAgentForm') as HTMLFormElement)?.requestSubmit()} className="px-6 py-2 bg-[var(--primary)] hover:bg-blue-600 text-white font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all">{isAr ? "إضافة" : "Add"}</button>
+          </>
+        }
+      >
+        <form id="addAgentForm" onSubmit={handleAddAgent} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الاسم" : "Name"}</label>
+            <input type="text" name="name" required className="input" />
           </div>
-        ))}
-      </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "الدور الوظيفي" : "Role"}</label>
+            <select name="role" className="input">
+              <option value="Sales Manager">{isAr ? "مدير مبيعات" : "Sales Manager"}</option>
+              <option value="Senior Sales Agent">{isAr ? "مسؤول مبيعات أول" : "Senior Sales Agent"}</option>
+              <option value="Sales Agent">{isAr ? "مسؤول مبيعات" : "Sales Agent"}</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "البريد الإلكتروني" : "Email"}</label>
+            <input type="email" name="email" required className="input" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 mb-1">{isAr ? "رقم الهاتف" : "Phone"}</label>
+            <input type="text" name="phone" required className="input" dir="ltr" />
+          </div>
+        </form>
+      </Modal>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-5 right-5 bg-slate-950 text-white px-4 py-3 rounded-xl shadow-2xl z-55 flex items-center gap-2.5 animate-in slide-in-from-bottom duration-300">
+          <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span className="text-sm font-semibold">{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }
