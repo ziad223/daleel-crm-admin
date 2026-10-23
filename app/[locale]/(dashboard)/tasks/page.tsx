@@ -300,6 +300,7 @@ export default function TasksPage() {
       )}
 
       {/* Add Task Modal */}
+      
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
