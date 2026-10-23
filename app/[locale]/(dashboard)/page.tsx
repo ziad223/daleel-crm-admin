@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  UserPlus, Users, Phone, MessageCircle, Target, TrendingUp,
+  UserPlus, Users, Target, TrendingUp,
   AlertTriangle, CheckCircle2, Clock, DollarSign, BarChart3, Zap
 } from "lucide-react";
 import {
@@ -36,12 +36,12 @@ export default function DashboardPage() {
   const locale = useLocale();
   const isAr = locale === 'ar';
   
-  const { stats, leadsByDay, monthlySales, employeePerformance, pipelineData, recentLeads, recentTasks, recentCalls, bestCampaigns, conversionRateHistory, recentNotifications } = getMockData(isAr);
+  const { stats, leadsByDay, monthlySales, employeePerformance, pipelineData, recentLeads, recentTasks, bestCampaigns, conversionRateHistory, recentNotifications } = getMockData(isAr);
 
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         <StatCard title={t("stat.totalLeads")} value={formatNumber(stats.totalLeads)} icon={UserPlus} color="bg-blue-100 text-blue-600" change={t("dash.thisMonth")} />
         <StatCard title={t("stat.newLeadsToday")} value={stats.newLeadsToday} icon={Zap} color="bg-emerald-100 text-emerald-600" />
         <StatCard title={t("stat.following")} value={formatNumber(stats.following)} icon={Clock} color="bg-amber-100 text-amber-600" />
@@ -50,8 +50,6 @@ export default function DashboardPage() {
         <StatCard title={t("stat.closedDeals")} value={stats.closedDeals} icon={CheckCircle2} color="bg-emerald-100 text-emerald-600" change="+8%" />
         <StatCard title={t("stat.salesValue")} value={formatCurrency(stats.salesValue)} icon={DollarSign} color="bg-green-100 text-green-700" />
         <StatCard title={t("stat.conversionRate")} value={`${stats.conversionRate}%`} icon={TrendingUp} color="bg-cyan-100 text-cyan-600" />
-        <StatCard title={t("stat.callsCount")} value={formatNumber(stats.callsCount)} icon={Phone} color="bg-indigo-100 text-indigo-600" />
-        <StatCard title={t("stat.whatsappCount")} value={formatNumber(stats.whatsappCount)} icon={MessageCircle} color="bg-teal-100 text-teal-600" />
         <StatCard title={t("stat.overdueTasks")} value={stats.overdueTasks} icon={AlertTriangle} color="bg-orange-100 text-orange-600" />
         <StatCard title={t("stat.employees")} value={stats.employees} icon={Users} color="bg-slate-100 text-slate-600" />
       </div>
@@ -250,27 +248,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Row 2: Recent Calls + Recent Notifications (Aligned Side-by-Side!) */}
-      <div className="grid lg:grid-cols-2 gap-6 text-start">
-        {/* Recent Calls */}
-        <div className="table-container">
-          <div className="px-5 py-4 border-b border-slate-100">
-            <h3 className="font-bold">{t("dash.recentCalls")}</h3>
-          </div>
-          <div className="divide-y divide-slate-50">
-            {recentCalls.map((call) => (
-              <div key={call.id} className="px-5 py-3 text-start">
-                <div className="flex justify-between">
-                  <span className="font-medium text-sm">{call.lead}</span>
-                  <span className="text-xs text-slate-400">{call.duration}</span>
-                </div>
-                <div className="text-xs text-slate-500 mt-0.5">{call.result}</div>
-                <div className="text-[11px] text-slate-400 mt-1">{call.time} · {call.agent}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
+      {/* Row 2: Recent Notifications */}
+      <div className="text-start">
         {/* Recent Notifications */}
         <div className="table-container">
           <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center">

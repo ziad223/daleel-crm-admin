@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import {
-  LayoutDashboard, Users, UserPlus, Target, BarChart3, Phone, MessageCircle,
+  LayoutDashboard, Users, UserPlus, Target, BarChart3,
   CheckSquare, Megaphone, Settings, CreditCard, FileText, Database,
-  Sparkles, Palette, Shield, Clock, LogOut
+  Palette, Shield, Clock, LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,14 +24,11 @@ const companyMenu: MenuItem[] = [
   { href: "/campaigns", key: "nav.campaigns", icon: Megaphone },
   { href: "/follow-ups", key: "nav.followups", icon: CheckSquare },
   { href: "/tasks", key: "nav.tasks", icon: CheckSquare },
-  { href: "/calls", key: "nav.calls", icon: Phone },
-  { href: "/whatsapp", key: "nav.whatsapp", icon: MessageCircle },
   { href: "/reports", key: "nav.reports", icon: BarChart3 },
   { href: "/team", key: "nav.team", icon: Users },
   { href: "/users", key: "nav.users", icon: Users },
   { href: "/roles", key: "nav.roles", icon: Shield },
   { href: "/attendance", key: "nav.attendance", icon: Clock },
-  { href: "/ai", key: "nav.ai", icon: Sparkles },
   { href: "/branding", key: "nav.branding", icon: Palette },
   { href: "/subscription", key: "nav.subscription", icon: CreditCard },
   { href: "/billing", key: "nav.billing", icon: FileText },

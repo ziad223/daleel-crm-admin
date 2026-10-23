@@ -40,10 +40,7 @@ export default function Lead360Page({ params }: { params: Promise<{ id: string }
 
   const tabs = [
     { id: "timeline", label: isAr ? "السجل (Timeline)" : "Timeline" },
-    { id: "calls", label: isAr ? "المكالمات" : "Calls" },
-    { id: "whatsapp", label: isAr ? "رسائل واتساب" : "WhatsApp" },
     { id: "tasks", label: isAr ? "المهام والملاحظات" : "Tasks & Notes" },
-    { id: "ai", label: isAr ? "تحليل الذكاء الاصطناعي" : "AI Insights" },
   ];
 
   return (
@@ -208,102 +205,21 @@ export default function Lead360Page({ params }: { params: Promise<{ id: string }
               </div>
             )}
 
-            {activeTab === "calls" && (
+            {activeTab === "tasks" && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-bold text-lg">{isAr ? "سجل المكالمات" : "Call History"}</h3>
-                  <button className="btn-accent btn-sm"><Phone className="w-4 h-4" /> {isAr ? "اتصال جديد" : "New Call"}</button>
+                  <h3 className="font-bold text-lg">{isAr ? "المهام والملاحظات" : "Tasks & Notes"}</h3>
+                  <button className="btn-accent btn-sm"><Plus className="w-4 h-4" /> {isAr ? "إضافة" : "Add"}</button>
                 </div>
-                {/* Call items */}
-                {[
-                  { date: "اليوم 10:30 ص", duration: "00:00", result: "لم يرد (No Answer)", agent: "سارة" },
-                  { date: "قبل 3 أيام 02:15 م", duration: "04:32", result: "مهتم، طلب عرض سعر", agent: "سارة" },
-                  { date: "قبل 5 أيام 11:00 ص", duration: "01:15", result: "مكالمة تعريفية", agent: "أحمد" }
-                ].map((call, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${call.duration === "00:00" ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"}`}>
-                        <Phone className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-800 text-sm mb-0.5">{call.result}</div>
-                        <div className="text-xs text-slate-500 flex items-center gap-3">
-                          <span>{call.date}</span>
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {call.duration}</span>
-                          <span className="flex items-center gap-1"><Bot className="w-3 h-3" /> {call.agent}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeTab === "whatsapp" && (
-              <div className="flex flex-col h-[500px]">
-                <div className="flex-1 bg-slate-50 rounded-t-xl border border-slate-100 p-4 overflow-y-auto space-y-4">
-                  {/* Chat bubbles */}
-                  <div className="flex justify-start">
-                    <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-tl-sm max-w-[80%] shadow-sm">
-                      <p className="text-sm text-slate-800">مرحباً أستاذ أحمد، معك سارة من مجموعة دليل الشرق. أرسلت لك عرض السعر كما طلبتم.</p>
-                      <span className="text-[10px] text-slate-400 mt-1 block">أمس 04:15 م</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <div className="bg-green-100 border border-green-200 p-3 rounded-2xl rounded-tr-sm max-w-[80%] shadow-sm">
-                      <p className="text-sm text-green-900">شكراً سارة. هل يمكن الحصول على خصم 10٪ إضافي؟</p>
-                      <span className="text-[10px] text-green-700/70 mt-1 block text-left">أمس 05:00 م</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3 bg-white border border-t-0 border-slate-100 rounded-b-xl flex gap-2">
-                  <input type="text" className="input flex-1 bg-slate-50" placeholder={isAr ? "اكتب رسالة واتساب..." : "Type WhatsApp message..."} />
-                  <button className="btn-accent bg-green-500 hover:bg-green-600"><MessageCircle className="w-4 h-4" /></button>
-                </div>
-              </div>
-            )}
-
-            {activeTab === "ai" && (
-              <div className="space-y-6">
-                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-5">
-                  <h3 className="font-bold text-indigo-900 flex items-center gap-2 mb-4">
-                    <Bot className="w-5 h-5" /> {isAr ? "تحليل الذكاء الاصطناعي الشامل" : "Comprehensive AI Analysis"}
-                  </h3>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
-                      <div className="text-xs text-slate-500 mb-1">{isAr ? "احتمالية الإغلاق" : "Closing Probability"}</div>
-                      <div className="text-2xl font-bold text-indigo-600">82%</div>
-                      <div className="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
-                        <div className="bg-indigo-500 h-full w-[82%]"></div>
-                      </div>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
-                      <div className="text-xs text-slate-500 mb-1">{isAr ? "تصنيف العميل" : "Lead Scoring"}</div>
-                      <div className="text-2xl font-bold text-emerald-600">{isAr ? "عميل A+" : "A+ Lead"}</div>
-                      <div className="text-xs text-slate-400 mt-1">{isAr ? "بناءً على التفاعل السريع" : "Based on fast engagement"}</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
-                      <h4 className="font-bold text-sm text-slate-800 mb-2 flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 text-amber-500" /> {isAr ? "اقتراح الخطوة القادمة" : "Suggested Next Step"}
-                      </h4>
-                      <p className="text-sm text-slate-600">
-                        {isAr ? "العميل ينتظر رد بخصوص خصم 10%. ينصح بالاتصال هاتفياً لمنحه الخصم كعرض محدود لمدة 24 ساعة لإغلاق الصفقة اليوم." : "Client is waiting for a response regarding a 10% discount. Recommend calling to offer it as a 24-hour limited offer to close today."}
-                      </p>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-50">
-                      <h4 className="font-bold text-sm text-slate-800 mb-2 flex items-center gap-2">
-                        <MessageCircle className="w-4 h-4 text-indigo-500" /> {isAr ? "اقتراح رسالة واتساب" : "Suggested WhatsApp Message"}
-                      </h4>
-                      <div className="bg-slate-50 p-3 rounded border border-slate-100 text-sm text-slate-700 font-medium italic relative">
-                        "مرحباً أستاذ أحمد، بناءً على طلبك وبسبب اهتمامك بخدماتنا، حصلت لك على موافقة استثنائية لخصم 10% صالح اليوم فقط. هل نعتمد العقد؟"
-                        <button className="absolute top-2 left-2 text-xs text-indigo-600 font-bold hover:underline">{isAr ? "استخدام" : "Use"}</button>
-                      </div>
-                    </div>
-                  </div>
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                   <div className="flex justify-between items-start mb-2">
+                      <div className="font-bold text-sm">الاتصال لتأكيد العرض النهائي</div>
+                      <span className="badge badge-warning">متوسطة</span>
+                   </div>
+                   <div className="text-xs text-slate-500 flex gap-4">
+                      <span>الاستحقاق: غداً 10:00 ص</span>
+                      <span>بواسطة: سارة</span>
+                   </div>
                 </div>
               </div>
             )}
